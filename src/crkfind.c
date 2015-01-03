@@ -25,21 +25,47 @@
 #include "emcrk/kfind.h"
 
 // -----------------------------------------------------------------------
+static void help()
+{
+	fprintf(stderr,
+		"crkfind - Look for CROOK-5 kernels in a file.\n"
+		"Usage: crkfind filename\n"
+	);
+}
+
+// -----------------------------------------------------------------------
 int main(int argc, char **argv)
 {
 	off_t words;
 
 	struct stat sb;
+
+	if (argc != 2) {
+		help();
+		exit(1);
+	}
+
 	if (stat(argv[1], &sb) == -1) {
-		perror("stat");
-		exit(EXIT_FAILURE);
+		fprintf(stderr, "Cannot stat file: %s\n", argv[1]);
+		exit(1);
 	}
 
 	uint16_t *buf = malloc(sb.st_size);
+	if (!buf) {
+		fprintf(stderr, "Memory allocation error.\n");
+		exit(1);
+	}
 
 	FILE *f = fopen(argv[1], "r");
+	if (!f) {
+		fprintf(stderr, "Cannot open file %s for reading.\n", argv[1]);
+		free(buf);
+		exit(1);
+	}
+
 	words = fread(buf, 2, sb.st_size/2, f);
 	fclose(f);
+
 	for (int i=0 ; i<words ; i++) {
 		buf[i] = ntohs(buf[i]);
 	}

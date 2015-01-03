@@ -27,18 +27,22 @@ install(FILES
 	DESTINATION include/emcrk
 )
 
-add_executable(emcrk
-	emcrk.c
+add_executable(crkfind
+	crkfind.c
 )
 
 add_executable(r40
 	r40tool.c
 )
 
-target_link_libraries(emcrk emcrk-lib)
+target_link_libraries(crkfind emcrk-lib)
 target_link_libraries(r40 emcrk-lib)
 
-install(TARGETS emcrk
+install(TARGETS crkfind
+	RUNTIME DESTINATION bin
+)
+
+install(TARGETS r40
 	RUNTIME DESTINATION bin
 )
 

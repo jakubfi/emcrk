@@ -96,7 +96,9 @@ uint16_t * ascii_to_r40(char *ascii, int *r40_len, uint16_t *r40)
 			if (r40_len) {
 				*r40_len = s-ascii;
 			}
-			free(r40);
+			if (!r40) {
+				free(dest);
+			}
 			return NULL;
 		}
 
@@ -117,7 +119,7 @@ uint16_t * ascii_to_r40(char *ascii, int *r40_len, uint16_t *r40)
 		*r40_len = result_len;
 	}
 
-    return r40;
+    return dest;
 }
 
 // -----------------------------------------------------------------------
