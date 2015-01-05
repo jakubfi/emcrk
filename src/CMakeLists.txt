@@ -5,6 +5,7 @@ add_library(emcrk-lib SHARED
 	names.c
 	process.c
 	exl.c
+	obj.c
 )
 
 set_target_properties(emcrk-lib PROPERTIES

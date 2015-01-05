@@ -19,6 +19,7 @@
 #include <stdlib.h>
 
 #include "emcrk/r40.h"
+#include "emcrk/obj.h"
 #include "emcrk/exl.h"
 
 #define CRK5_EXL_MIN 128
@@ -178,15 +179,13 @@ struct crk5_exl_fil * crk5_exl_fil_unpack(uint16_t *data)
 	exl->stream_id = data[1];
 	exl->type = data[2];
 	exl->len = data[3];
-	exl->param1 = data[4];
-	exl->param2 = data[5];
+	exl->param[0] = data[4];
+	exl->param[1] = data[5];
 	exl->rights = (data[6] & 0b1111110000000000) >> 10;
 	exl->attributes = (data[6] & 0b0000001111110000) >> 4;
 	exl->mem = (data[6] & 0b0000000000001111) >> 0;
-	exl->disk = r40_to_ascii(data+7, 1, NULL);
-	exl->dir = r40_to_ascii(data+8, 2, NULL);
-	exl->file = r40_to_ascii(data+10, 2, NULL);
-	// TODO: STR/DEV/MES/RAM
+	exl->obj = crk5_obj_unpack(data+7, &(exl->obj_type));
+
 	return exl;
 };
 
@@ -194,9 +193,6 @@ struct crk5_exl_fil * crk5_exl_fil_unpack(uint16_t *data)
 void crk5_exl_fil_delete(struct crk5_exl_fil *exl)
 {
 	if (!exl) return;
-	free(exl->disk);
-	free(exl->dir);
-	free(exl->file);
 	free(exl);
 }
 
@@ -209,7 +205,7 @@ struct crk5_exl_tmem * crk5_exl_tmem_unpack(uint16_t *data)
 	exl->err = data[0];
 	exl->stream_id = data[1];
 	exl->addr = data[2];
-	exl->unused = data[3];
+	// data[3] - unused
 	exl->block_num = data[4];
 
 	return exl;
@@ -286,7 +282,246 @@ void crk5_exl_proc_delete(struct crk5_exl_proc *exl)
 }
 
 // -----------------------------------------------------------------------
+struct crk5_exl_pinf *crk5_exl_pinf_unpack(uint16_t *data)
+{
+	struct crk5_exl_pinf *exl = malloc(sizeof(struct crk5_exl_pinf));
+	if (!exl) return NULL;
+
+	exl->gen = data[0];
+	exl->seg_total = data[1] >> 8;
+	exl->user_rights = data[1] & 0xff;
+	exl->prio = data[2];
+	exl->spec_file_len = data[3];
+	exl->entry_addr = data[4];
+	exl->words_used = data[5];
+	exl->attr = data[6];
+	exl->space_name = r40_to_ascii(data+7, 1, NULL);
+	exl->user_name = r40_to_ascii(data+8, 2, NULL);
+	exl->proc_name = r40_to_ascii(data+10, 2, NULL);
+
+	return exl;
+}
+
 // -----------------------------------------------------------------------
+void crk5_exl_pinf_delete(struct crk5_exl_pinf *exl)
+{
+	if (!exl) return;
+	free(exl->space_name);
+	free(exl->user_name);
+	free(exl->proc_name);
+	free(exl);
+}
+
 // -----------------------------------------------------------------------
+struct crk5_exl_err * crk5_exl_err_unpack(uint16_t *data)
+{
+	struct crk5_exl_err *exl = malloc(sizeof(struct crk5_exl_err));
+	if (!exl) return NULL;
+
+	exl->proc_addr = data[0];
+	exl->alarm_addr = data[1];
+	exl->alarm_nr = data[2] & 0xff;
+
+	return exl;
+}
+
+// -----------------------------------------------------------------------
+void crk5_exl_err_delete(struct crk5_exl_err *exl)
+{
+	if (!exl) return;
+	free(exl);
+}
+
+// -----------------------------------------------------------------------
+struct crk5_exl_str * crk5_exl_str_unpack(uint16_t *data)
+{
+	struct crk5_exl_str *exl = malloc(sizeof(struct crk5_exl_str));
+	if (!exl) return NULL;
+
+	exl->err = data[0];
+	exl->stream_id = data[1];
+
+	return exl;
+}
+// -----------------------------------------------------------------------
+void crk4_exl_str_delete(struct crk5_exl_str *exl)
+{
+	if (!exl) return;
+	free(exl);
+}
+
+// -----------------------------------------------------------------------
+struct crk5_exl_dir * crk5_exl_dir_unpack(uint16_t *data)
+{
+	struct crk5_exl_dir *exl = malloc(sizeof(struct crk5_exl_dir));
+	if (!exl) return NULL;
+
+	exl->count = data[0];
+	exl->user_id = malloc(sizeof(uint16_t) * exl->count);
+	exl->dir_id = malloc(sizeof(uint16_t) * exl->count);
+	for (int i=0 ; i<exl->count ; i++) {
+		exl->user_id[i] = data[1+i*2+0];
+		exl->dir_id[i] = data[1+i*2+1];
+	}
+
+	return exl;
+}
+
+// -----------------------------------------------------------------------
+void crk5_exl_dir_delete(struct crk5_exl_dir *exl)
+{
+	if (!exl) return;
+	free(exl->user_id);
+	free(exl->dir_id);
+	free(exl);
+}
+
+// -----------------------------------------------------------------------
+struct crk5_exl_met * crk5_exl_met_unpack(uint16_t *data)
+{
+	struct crk5_exl_met *exl = malloc(sizeof(struct crk5_exl_met));
+	if (!exl) return NULL;
+
+	exl->disk_id = data[0];
+	exl->disk_name = r40_to_ascii(data, 1, NULL);
+	exl->dicdic_addr = data[1];
+	exl->fildic_addr = data[2];
+	exl->mapa_addr = data[3];
+	exl->len = data[4];
+
+	return exl;
+}
+
+// -----------------------------------------------------------------------
+void crk5_exl_met_delete(struct crk5_exl_met *exl)
+{
+	if (!exl) return;
+	free(exl->disk_name);
+	free(exl);
+}
+
+// -----------------------------------------------------------------------
+struct crk5_exl_rec * crk5_exl_rec_unpack(uint16_t *data)
+{
+	struct crk5_exl_rec *exl = malloc(sizeof(struct crk5_exl_rec));
+	if (!exl) return NULL;
+
+	exl->char_n = data[0];
+	exl->stream_id = data[1];
+	exl->buf_addr = data[2];
+	exl->end_char = data[3] >> 8;
+	exl->len = data[3] & 0xff;
+	exl->prechars[0] = data[4] >> 8;
+	exl->prechars[1] = data[4] & 0xff;
+	exl->prechars[2] = 0;
+
+	return exl;
+}
+
+// -----------------------------------------------------------------------
+void crk5_exl_rec_delete(struct crk5_exl_rec *exl)
+{
+	if (!exl) return;
+	free(exl);
+}
+
+// -----------------------------------------------------------------------
+struct crk5_exl_block * crk5_exl_block_unpack(uint16_t *data)
+{
+	struct crk5_exl_block *exl = malloc(sizeof(struct crk5_exl_block));
+	if (!exl) return NULL;
+
+	exl->transmitted = data[0];
+	exl->stream_id = data[1];
+	exl->addr = data[2];
+	exl->count = data[3];
+	exl->start_sector = data[4];
+
+	return exl;
+}
+
+// -----------------------------------------------------------------------
+void crk5_exl_block_delete(struct crk5_exl_block *exl)
+{
+	if (!exl) return;
+	free(exl);
+}
+
+// -----------------------------------------------------------------------
+struct crk5_exl_mt * crk5_exl_mt_unpack(uint16_t *data)
+{
+	struct crk5_exl_mt *exl = malloc(sizeof(struct crk5_exl_mt));
+	if (!exl) return NULL;
+
+	exl->tape_end = (data[0] >> 15) & 1;
+	exl->tape_rev_start = (data[0] >> 14) & 1;
+	exl->file_mark = (data[0] >> 13) & 1;
+	exl->transmitted = data[0] & 0b0001111111111111;
+	exl->unit_num = data[1];
+	exl->addr = data[2];
+	exl->len = data[3];
+
+	return exl;
+}
+
+// -----------------------------------------------------------------------
+void crk5_exl_mt_delete(struct crk5_exl_mt *exl)
+{
+	if (!exl) return;
+	free(exl);
+}
+
+// -----------------------------------------------------------------------
+struct crk5_exl_pi * crk5_exl_pi_unpack(uint16_t *data)
+{
+	struct crk5_exl_pi *exl = malloc(sizeof(struct crk5_exl_pi));
+	if (!exl) return NULL;
+
+	exl->comm = data[0];
+	exl->o = (data[1] & 0b1100000000000000) >> 14;
+	exl->f = (data[1] & 0b0011100000000000) >> 11;
+	exl->chan_num = (data[1] & 0b0000011100000000) >> 8;
+	if (exl->f == 0) {
+		exl->fc = (data[1] & 0b0000000000011100) >> 2;
+	} else {
+		exl->addr_kas = (data[1] & 0b0000000011110000) >> 4;
+		exl->addr_pak = (data[1] & 0b0000000000001111);
+	}
+
+	return exl;
+}
+
+// -----------------------------------------------------------------------
+void crk5_exl_pi_delete(struct crk5_exl_pi *exl)
+{
+	if (!exl) return;
+	free(exl);
+}
+
+// -----------------------------------------------------------------------
+struct crk5_exl_cam * crk5_exl_cam_unpack(uint16_t *data)
+{
+	struct crk5_exl_cam *exl = malloc(sizeof(struct crk5_exl_cam));
+	if (!exl) return NULL;
+
+	exl->request = (data[0] & 0b0000111100000000) >> 8;
+	exl->response = (data[0] & 0b1110000000000000) >> 13;
+	exl->transmitted = (data[0] & 0b0001111111111111);
+	exl->c = (data[1] & 0b1100000000000000) >> 14;
+	exl->f = (data[1] & 0b0011111000000000) >> 9;
+	exl->a = (data[1] & 0b0000000111100000) >> 5;
+	exl->n = (data[1] & 0b0000000000011111);
+	exl->addr = data[2];
+	exl->count = data[3];
+
+	return exl;
+}
+
+// -----------------------------------------------------------------------
+void crk5_exl_cam_delete(struct crk5_exl_cam *exl)
+{
+	if (!exl) return;
+	free(exl);
+}
 
 // vim: tabstop=4 shiftwidth=4 autoindent
