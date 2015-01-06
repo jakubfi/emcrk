@@ -57,6 +57,9 @@ TABUJB	55 61	?
 len		56 62 
 */
 
+#define CRK5N_PROCESS_SIZE 56
+#define CRK5P_PROCESS_SIZE 62
+
 struct crk5_process {
 	uint16_t ic, r0, sr;	// ICE
 	uint16_t r1, r2, r3, r4, r5, r6, r7; // REJE
@@ -94,9 +97,6 @@ struct crk5_process {
 	uint16_t addr;
 	char *name;
 };
-
-#define CRK5N_PROCESS_SIZE 56
-#define CRK5P_PROCESS_SIZE 62
 
 struct crk5_process * crk5_process_unpack(uint16_t *ptr, uint16_t addr, int kern_mod);
 void crk5_process_delete(struct crk5_process *ptr);

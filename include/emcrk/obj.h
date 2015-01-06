@@ -16,6 +16,8 @@ enum crk5_obj_types {
 	CRK5_OBJ_MEM,
 };
 
+#define CRK5_OBJ_SIZE 5
+
 struct crk5_obj_stream {
 	uint16_t id;
 };

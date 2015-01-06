@@ -25,6 +25,8 @@ install(FILES
 	${CMAKE_SOURCE_DIR}/include/emcrk/process.h
 	${CMAKE_SOURCE_DIR}/include/emcrk/kfind.h
 	${CMAKE_SOURCE_DIR}/include/emcrk/conf.h
+	${CMAKE_SOURCE_DIR}/include/emcrk/obj.h
+	${CMAKE_SOURCE_DIR}/include/emcrk/exl.h
 	DESTINATION include/emcrk
 )
 

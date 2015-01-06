@@ -58,6 +58,8 @@ struct crk5_cfg_tape {
 	unsigned chan;
 };
 
+#define CRK5_CFG_SIZE 60
+
 // -----------------------------------------------------------------------
 struct crk5_cfg {
 	// 4

@@ -29,6 +29,8 @@ struct crk5_exl {
 	char *desc;
 };
 
+#define CRK5_EXL_FIL_SIZE 12
+
 struct crk5_exl_fil {
 	uint16_t err;
 	uint16_t stream_id;
@@ -42,6 +44,8 @@ struct crk5_exl_fil {
 	void *obj;
 };
 
+#define CRK5_EXL_TMEM_SIZE 5
+
 struct crk5_exl_tmem {
 	uint16_t err;
 	uint16_t stream_id;
@@ -49,17 +53,23 @@ struct crk5_exl_tmem {
 	uint16_t block_num;
 };
 
+#define CRK5_EXL_DAT_SIZE 3
+
 struct crk5_exl_dat {
 	uint16_t year;
 	uint16_t month;
 	uint16_t day;
 };
 
+#define CRK5_EXL_TIM_SIZE 3
+
 struct crk5_exl_tim {
 	uint16_t hour;
 	uint16_t minute;
 	uint16_t second;
 };
+
+#define CRK5_EXL_PROC_SIZE 12
 
 struct crk5_exl_proc {
 	uint16_t err;
@@ -69,6 +79,8 @@ struct crk5_exl_proc {
 	uint16_t prio_state;
 	uint16_t uregs[7];
 };
+
+#define CRK5_EXL_PINF_SIZE 12
 
 struct crk5_exl_pinf {
 	uint16_t gen;
@@ -84,22 +96,30 @@ struct crk5_exl_pinf {
 	char *proc_name;
 };
 
+#define CRK5_EXL_ERR_SIZE 3
+
 struct crk5_exl_err {
 	uint16_t proc_addr;
 	uint16_t alarm_addr;
 	uint8_t alarm_nr;
 };
 
+#define CRK5_EXL_STR_SIZE 2
+
 struct crk5_exl_str {
 	uint16_t err;
 	uint16_t stream_id;
 };
+
+#define CRK5_EXL_DIR_SIZE 33
 
 struct crk5_exl_dir {
 	uint16_t count;
 	uint16_t *user_id;
 	uint16_t *dir_id;
 };
+
+#define CRK5_EXL_MET_SIZE 5
 
 struct crk5_exl_met {
 	uint16_t disk_id;
@@ -110,6 +130,8 @@ struct crk5_exl_met {
 	uint16_t len;
 };
 
+#define CRK5_EXL_REC_SIZE 5
+
 struct crk5_exl_rec {
 	uint16_t char_n;
 	uint16_t stream_id;
@@ -119,6 +141,8 @@ struct crk5_exl_rec {
 	char prechars[3];
 };
 
+#define CRK5_EXL_BLOCK_SIZE 5
+
 struct crk5_exl_block {
 	uint16_t transmitted;
 	uint16_t stream_id;
@@ -126,6 +150,8 @@ struct crk5_exl_block {
 	uint16_t count;
 	uint16_t start_sector;
 };
+
+#define CRK5_EXL_MT_SIZE 4
 
 struct crk5_exl_mt {
 	int tape_end;
@@ -137,6 +163,8 @@ struct crk5_exl_mt {
 	uint16_t len;
 };
 
+#define CRK5_EXL_PI_SIZE 2
+
 struct crk5_exl_pi {
 	uint16_t comm;
 	int o;
@@ -146,6 +174,8 @@ struct crk5_exl_pi {
 	int addr_kas;
 	int addr_pak;
 };
+
+#define CRK5_EXL_CAM_SIZE 4
 
 struct crk5_exl_cam {
 	int request;
