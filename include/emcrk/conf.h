@@ -15,6 +15,9 @@
 //  Foundation, Inc.,
 //  51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 
+#ifndef CRK5_CFG_H
+#define CRK5_CFG_H
+
 #include <inttypes.h>
 
 // -----------------------------------------------------------------------
@@ -136,5 +139,7 @@ struct crk5_cfg {
 	// 31-3f
 	struct crk5_cfg_chdev *chdev[15];
 };
+
+#endif
 
 // vim: tabstop=4 shiftwidth=4 autoindent

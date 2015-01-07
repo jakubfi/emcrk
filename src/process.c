@@ -49,12 +49,6 @@ struct crk5_process * crk5_process_unpack(uint16_t *ptr, uint16_t addr, int kern
 
 	memcpy(&(proc->_r1), ptr+42+offset, 2*13); // REJ..JLOLEN
 
-	if (kern_mod) {
-		proc->TABUJB = ptr[61];
-	} else {
-		proc->TABUJB = ptr[55];
-	}
-
 	proc->addr = addr;
 	proc->name = r40_to_ascii(proc->r40_name, 2, NULL);
 	proc->segments &= 0xff;

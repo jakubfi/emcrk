@@ -15,8 +15,15 @@
 //  Foundation, Inc.,
 //  51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 
+#ifndef CRK5_R40_H
+#define CRK5_R40_H
+
+#include <inttypes.h>
+
 int r40len(char *s);
 uint16_t * ascii_to_r40(char *ascii, unsigned *r40_len, uint16_t *r40);
 char * r40_to_ascii(uint16_t *r40, unsigned r40_len, char *ascii);
+
+#endif
 
 // vim: tabstop=4 shiftwidth=4 autoindent

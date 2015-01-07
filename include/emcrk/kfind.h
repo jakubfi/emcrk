@@ -15,6 +15,9 @@
 //  Foundation, Inc.,
 //  51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 
+#ifndef CRK5_KERN_H
+#define CRK5_KERN_H
+
 #include <inttypes.h>
 
 struct crk5_kern_result {
@@ -32,5 +35,7 @@ struct crk5_kern_result {
 struct crk5_kern_result * crk5_kern_find(uint16_t *buf, off_t len);
 struct crk5_kern_result * crk5_kern_findall(uint16_t *buf, off_t len);
 void crk5_kern_res_drop(struct crk5_kern_result *kern);
+
+#endif
 
 // vim: tabstop=4 shiftwidth=4 autoindent

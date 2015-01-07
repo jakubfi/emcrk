@@ -15,6 +15,11 @@
 //  Foundation, Inc.,
 //  51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 
+#ifndef CRK5_CONF_H
+#define CRK5_CONF_H
+
+#include <inttypes.h>
+
 /*
 CROOK-5 v8 process structure for N and P kernels:
 
@@ -52,13 +57,13 @@ JPAD	50 52	process entry address
 JACN	51 53	POZYCJA PRG W FILDIC
 JNAME	52 54	process name (r40-encoded)
 JLOLEN	54 56	process image size (words loaded)
-TABUJB	55 61	?
-------------------
-len		56 62 
+--------------------------------------------------
+TABUJB	55 61	total size of process structure
 */
 
-#define CRK5N_PROCESS_SIZE 56
-#define CRK5P_PROCESS_SIZE 62
+#define CRK5_BPROG 0x62
+#define CRK5N_PROCESS_SIZE 55
+#define CRK5P_PROCESS_SIZE 61
 
 struct crk5_process {
 	uint16_t ic, r0, sr;	// ICE
@@ -92,7 +97,6 @@ struct crk5_process {
 	uint16_t JACN;			// JACN
 	uint16_t r40_name[2];	// JNAME
 	uint16_t size;			// JLOLEN
-	uint16_t TABUJB;		// TABUJB
 
 	uint16_t addr;
 	char *name;
@@ -101,5 +105,6 @@ struct crk5_process {
 struct crk5_process * crk5_process_unpack(uint16_t *ptr, uint16_t addr, int kern_mod);
 void crk5_process_delete(struct crk5_process *ptr);
 
+#endif
 
 // vim: tabstop=4 shiftwidth=4 autoindent
