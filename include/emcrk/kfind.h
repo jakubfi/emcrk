@@ -15,8 +15,8 @@
 //  Foundation, Inc.,
 //  51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 
-#ifndef CRK5_KERN_H
-#define CRK5_KERN_H
+#ifndef CRK5_KFIND_H
+#define CRK5_KFIND_H
 
 #include <inttypes.h>
 

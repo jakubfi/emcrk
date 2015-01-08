@@ -1,6 +1,6 @@
 add_library(emcrk-lib SHARED
 	r40.c
-	conf.c
+	cfg.c
 	kfind.c
 	names.c
 	process.c
@@ -24,7 +24,7 @@ install(FILES
 	${CMAKE_SOURCE_DIR}/include/emcrk/r40.h
 	${CMAKE_SOURCE_DIR}/include/emcrk/process.h
 	${CMAKE_SOURCE_DIR}/include/emcrk/kfind.h
-	${CMAKE_SOURCE_DIR}/include/emcrk/conf.h
+	${CMAKE_SOURCE_DIR}/include/emcrk/cfg.h
 	${CMAKE_SOURCE_DIR}/include/emcrk/obj.h
 	${CMAKE_SOURCE_DIR}/include/emcrk/exl.h
 	DESTINATION include/emcrk
