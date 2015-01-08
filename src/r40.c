@@ -28,23 +28,23 @@ int r40len(char *s)
 // -----------------------------------------------------------------------
 static int char_to_r40(char c)
 {
-    if ((c >= 'A') && (c <= 'Z')) {
-        return c - 64;
-    } else if ((c >= 'a') && (c <= 'z')) {
-        return c - 96;
-    } else if ((c >= '0') && (c <= '9')) {
-        return c - 21;
-    } else if (c == '_') {
-        return 37;
-    } else if (c == '%') {
-        return 38;
-    } else if (c == '#') {
-        return 39;
+	if ((c >= 'A') && (c <= 'Z')) {
+		return c - 64;
+	} else if ((c >= 'a') && (c <= 'z')) {
+		return c - 96;
+	} else if ((c >= '0') && (c <= '9')) {
+		return c - 21;
+	} else if (c == '_') {
+		return 37;
+	} else if (c == '%') {
+		return 38;
+	} else if (c == '#') {
+		return 39;
 	} else if (c == 0) {
 		return 0;
-    } else {
-        return -1;
-    }
+	} else {
+		return -1;
+	}
 }
 
 // -----------------------------------------------------------------------
@@ -71,7 +71,7 @@ static int r40_to_char(unsigned i)
 uint16_t * ascii_to_r40(char *ascii, int *r40_len, uint16_t *r40)
 {
 	char *s = ascii;
-    int mul = 1600;
+	int mul = 1600;
 	int result_len = r40len(ascii);
 	uint16_t *dest;
 
@@ -89,7 +89,7 @@ uint16_t * ascii_to_r40(char *ascii, int *r40_len, uint16_t *r40)
 
 	*r40p = 0;
 
-    while (s && *s) {
+	while (s && *s) {
 		int ch = char_to_r40(*s);
 
 		if (ch < 0) {
@@ -109,17 +109,17 @@ uint16_t * ascii_to_r40(char *ascii, int *r40_len, uint16_t *r40)
 			*r40p = 0;
 			mul = 1600;
 		} else {
-	        mul /= 40;
+			mul /= 40;
 		}
 
-        s++;
-    }
+		s++;
+	}
 
 	if (r40_len) {
 		*r40_len = result_len;
 	}
 
-    return dest;
+	return dest;
 }
 
 // -----------------------------------------------------------------------
