@@ -63,7 +63,7 @@ struct crk5_obj_dev {
 struct crk5_obj_mes {
 	uint16_t addr;
 	int len;
-	uint16_t receiver;
+	uint16_t recv_process;
 };
 
 struct crk5_obj_mem {

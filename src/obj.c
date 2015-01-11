@@ -18,8 +18,8 @@
 #include <inttypes.h>
 #include <stdlib.h>
 
-#include "emcrk/r40.h"
-#include "emcrk/obj.h"
+#include "r40.h"
+#include "obj.h"
 
 // -----------------------------------------------------------------------
 void * crk5_obj_unpack(uint16_t *data, int *type)
@@ -90,7 +90,7 @@ struct crk5_obj_disk * crk5_obj_disk_unpack(uint16_t *data)
 	if (!obj) return NULL;
 
 	obj->space = data[0];
-	obj->space_name = r40_to_ascii(data+1, 1, NULL);
+	obj->space_name = r40_to_ascii(data, 1, NULL);
 	obj->start = data[1];
 	obj->end = data[2];
 
@@ -104,6 +104,7 @@ void crk5_obj_disk_delete(struct crk5_obj_disk *obj)
 	free(obj->space_name);
 	free(obj);
 }
+
 // -----------------------------------------------------------------------
 struct crk5_obj_file * crk5_obj_file_unpack(uint16_t *data)
 {
@@ -126,6 +127,7 @@ void crk5_obj_file_delete(struct crk5_obj_file *obj)
 	free(obj->file_name);
 	free(obj);
 }
+
 // -----------------------------------------------------------------------
 struct crk5_obj_dev * crk5_obj_dev_unpack(uint16_t *data)
 {
@@ -144,6 +146,7 @@ void crk5_obj_dev_delete(struct crk5_obj_dev *obj)
 	if (!obj) return;
 	free(obj);
 }
+
 // -----------------------------------------------------------------------
 struct crk5_obj_mes * crk5_obj_mes_unpack(uint16_t *data)
 {
@@ -152,7 +155,7 @@ struct crk5_obj_mes * crk5_obj_mes_unpack(uint16_t *data)
 
 	obj->addr = data[1];
 	obj->len = data[2];
-	obj->receiver = data[3];
+	obj->recv_process = data[3];
 
 	return obj;
 }
@@ -163,6 +166,7 @@ void crk5_obj_mes_delete(struct crk5_obj_mes *obj)
 	if (!obj) return;
 	free(obj);
 }
+
 // -----------------------------------------------------------------------
 struct crk5_obj_mem * crk5_obj_mem_unpack(uint16_t *data)
 {

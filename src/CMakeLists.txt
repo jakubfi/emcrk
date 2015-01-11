@@ -11,7 +11,6 @@ add_library(emcrk-lib SHARED
 set_target_properties(emcrk-lib PROPERTIES
 	OUTPUT_NAME "emcrk"
 	SOVERSION ${EMCRK_VERSION_MAJOR}.${EMCRK_VERSION_MINOR}
-	PUBLIC_HEADER "${CMAKE_SOURCE_DIR}/include/emcrk.h"
 )
 
 install(TARGETS emcrk-lib
@@ -21,12 +20,12 @@ install(TARGETS emcrk-lib
 )
 
 install(FILES
-	${CMAKE_SOURCE_DIR}/include/emcrk/r40.h
-	${CMAKE_SOURCE_DIR}/include/emcrk/process.h
-	${CMAKE_SOURCE_DIR}/include/emcrk/kfind.h
-	${CMAKE_SOURCE_DIR}/include/emcrk/cfg.h
-	${CMAKE_SOURCE_DIR}/include/emcrk/obj.h
-	${CMAKE_SOURCE_DIR}/include/emcrk/exl.h
+	${CMAKE_SOURCE_DIR}/include/r40.h
+	${CMAKE_SOURCE_DIR}/include/process.h
+	${CMAKE_SOURCE_DIR}/include/kfind.h
+	${CMAKE_SOURCE_DIR}/include/cfg.h
+	${CMAKE_SOURCE_DIR}/include/obj.h
+	${CMAKE_SOURCE_DIR}/include/exl.h
 	DESTINATION include/emcrk
 )
 

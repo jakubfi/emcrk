@@ -18,143 +18,144 @@
 #include <inttypes.h>
 #include <stdlib.h>
 
-#include "emcrk/r40.h"
-#include "emcrk/obj.h"
-#include "emcrk/exl.h"
+#include "r40.h"
+#include "obj.h"
+#include "exl.h"
 
 #define CRK5_EXL_MIN 128
-#define CRK5_EXL_MAX 155
+#define CRK5_EXL_MAX 255
 
-const struct crk5_exl crk5_exl_invalid = { CRK5_EXL_INVALID, NULL, NULL };
+const struct crk5_exl crk5_exl_invalid = { CRK5_EXL_ARG_NONE, 0, NULL, NULL };
 
 const struct crk5_exl crk5_exl_list[] = {
-	{ /* 128 */ CRK5_EXL_FIL, "ASG", "Assign stream to file" },
-	{ /* 129 */ CRK5_EXL_FIL, "CASG", "Create file and assign stream" },
-	{ /* 130 */ CRK5_EXL_FIL, "SETP", "Set file parameters" },
-	{ /* 131 */ CRK5_EXL_FIL, "LOAP", "Get file parameters" },
-	{ /* 132 */ CRK5_EXL_TMEM, "TMEM", "Add memory for process" },
-	{ /* 133 */ CRK5_EXL_FIL, "NASG", "Add stream to file" },
-	{ /* 134 */ CRK5_EXL_STR, "ERF", "Remove file" },
-	{ /* 135 */ CRK5_EXL_STR, "ERS", "Remove stream" },
-	{ /* 136 */ CRK5_EXL_NONE, "ERAS", "Remove streams" },
-	{ /* 137 */ CRK5_EXL_STR, "FBOF", "Seek stream to beginning" },
-	{ /* 138 */ CRK5_EXL_REC, "INPR", "Read record" },
-	{ /* 139 */ CRK5_EXL_REC, "PRIR", "Write record" },
-	{ /* 140 */ CRK5_EXL_REC, "PINP", "Write 2-char and read record" },
-	{ /* 141 */ CRK5_EXL_REC, "PRIN", "Write record no ending char" },
-	{ /* 142 */ CRK5_EXL_STR, "EOF", "Write end char" },
-	{ /* 143 */ CRK5_EXL_STR, "FEOF", "Seek stream to end" },
-	{ /* 144 */ CRK5_EXL_REC, "INAM", "Get parameter from buffer" },
-	{ /* 145 */ CRK5_EXL_REC, "INUM", "Get number from buffer" },
-	{ /* 146 */ CRK5_EXL_BLOCK, "WADR", "Write disk addresses" },
-	{ /* 147 */ CRK5_EXL_BLOCK, "OVL", "Read overlay" },
-	{ /* 148 */ CRK5_EXL_BLOCK, "REAP", "Read from special file" },
-	{ /* 149 */ CRK5_EXL_BLOCK, "WRIP", "Write to process special file" },
-	{ /* 150 */ CRK5_EXL_BLOCK, "READ", "Read block" },
-	{ /* 151 */ CRK5_EXL_BLOCK, "WRIT", "Write block" },
-	{ /* 152 */ CRK5_EXL_ERR, "OES", "Set own alarm handler" },
-	{ /* 153 */ CRK5_EXL_NONE, "ERR", "Handle last alarm" },
-	{ /* 154 */ CRK5_EXL_R4, "CORE", "Allocate memory" },
-	{ /* 155 */ CRK5_EXL_FIL, "CPRF", "Create special file" },
-	{ /* 156 */ CRK5_EXL_PROC, "JUMP", "Move process to a separate block" },
-	{ /* 157 */ CRK5_EXL_DIR, "SDIR", "Set directory parameters" },
-	{ /* 158 */ CRK5_EXL_DIR, "TDIR", "Get directory parameters" },
-	{ /* 159 */ CRK5_EXL_DIR, "CDIR", "Change directory parameters" },
-	{ /* 160 */ CRK5_EXL_PROC, "DEFP", "Define child process" },
-	{ /* 161 */ CRK5_EXL_PROC, "DELP", "Remove child process" },
-	{ /* 162 */ CRK5_EXL_PROC, "SREG", "Set child process registers" },
-	{ /* 163 */ CRK5_EXL_PROC, "TREG", "Get child process registers" },
-	{ /* 164 */ CRK5_EXL_PROC, "RUNP", "Start child process" },
-	{ /* 165 */ CRK5_EXL_PROC, "HANG", "Stop child process" },
-	{ /* 166 */ CRK5_EXL_R4, "TERR", "Check children alarm list" },
-	{ /* 167 */ CRK5_EXL_R4, "WAIT", "Wait N quants", },
-	{ /* 168 */ CRK5_EXL_R4, "STOP", "Stop and wait N quants", },
-	{ /* 169 */ CRK5_EXL_NONE, "RELD", "Release character devices" },
-	{ /* 170 */ CRK5_EXL_DAT, "DATE", "Get date" },
-	{ /* 171 */ CRK5_EXL_TIM, "TIME", "Get time" },
-	{ /* 172 */ CRK5_EXL_INVALID, NULL, NULL },
-	{ /* 173 */ CRK5_EXL_R4, "CHPI", "Change priority",  },
-	{ /* 174 */ CRK5_EXL_R4, "WAIS", "Semaphore wait",  },
-	{ /* 175 */ CRK5_EXL_R4, "SIGN", "Semaphore signal",  },
-	{ /* 176 */ CRK5_EXL_MET, "TLAB", "Get disk label" },
-	{ /* 177 */ CRK5_EXL_PINF, "PINF", "Get process info" },
-	{ /* 178 */ CRK5_EXL_R4, "CSUM", "Check OS control sum",  },
-	{ /* 179 */ CRK5_EXL_R4, "CSYS", "Change system" },
-	{ /* 180 */ CRK5_EXL_R4, "UNL", "Unloaddisk area" },
-	{ /* 181 */ CRK5_EXL_R4, "LOD", "Load disk area" },
-	{ /* 182 */ CRK5_EXL_STR, "TAKS", "Take stream semaphore" },
-	{ /* 183 */ CRK5_EXL_STR, "RELS", "Release stream semaphore" },
-	{ /* 184 */ CRK5_EXL_R4, "GMEM", "Add memory segmets" },
-	{ /* 185 */ CRK5_EXL_R4, "RMEM", "Free memory segments" },
-	{ /* 186 */ CRK5_EXL_TABL, "LRAM", "Get RAM file parameters" },
-	{ /* 187 */ CRK5_EXL_INVALID, NULL, NULL },
-	{ /* 188 */ CRK5_EXL_INVALID, NULL, NULL },
-	{ /* 189 */ CRK5_EXL_PI, "OPPI", "PI operation" },
-	{ /* 190 */ CRK5_EXL_PI, "WFPI", "Get PI interrupt" },
-	{ /* 191 */ CRK5_EXL_CAM, "CAMAC", "CAMAC operation" },
-	{ /* 192 */ CRK5_EXL_MT, "RWMT", "Rewind tape to the beginning" },
-	{ /* 193 */ CRK5_EXL_MT, "FBMT", "Rewind tape by one file" },
-	{ /* 194 */ CRK5_EXL_MT, "FFMT", "Forward tape by one file" },
-	{ /* 195 */ CRK5_EXL_MT, "BBMT", "Rewind tape one block" },
-	{ /* 196 */ CRK5_EXL_MT, "BFMT", "Forward tape one block" },
-	{ /* 197 */ CRK5_EXL_MT, "FMMT", "Write file mark" },
-	{ /* 198 */ CRK5_EXL_MT, "REMT", "Read block from tape" },
-	{ /* 199 */ CRK5_EXL_MT, "WRMT", "Write block to tape" },
-	{ /* 201 */ CRK5_EXL_INVALID, NULL, NULL },
-	{ /* 202 */ CRK5_EXL_INVALID, NULL, NULL },
-	{ /* 203 */ CRK5_EXL_INVALID, NULL, NULL },
-	{ /* 204 */ CRK5_EXL_INVALID, NULL, NULL },
-	{ /* 205 */ CRK5_EXL_INVALID, NULL, NULL },
-	{ /* 206 */ CRK5_EXL_INVALID, NULL, NULL },
-	{ /* 207 */ CRK5_EXL_INVALID, NULL, NULL },
-	{ /* 208 */ CRK5_EXL_INVALID, NULL, NULL },
-	{ /* 209 */ CRK5_EXL_INVALID, NULL, NULL },
-	{ /* 210 */ CRK5_EXL_INVALID, NULL, NULL },
-	{ /* 211 */ CRK5_EXL_INVALID, NULL, NULL },
-	{ /* 212 */ CRK5_EXL_INVALID, NULL, NULL },
-	{ /* 213 */ CRK5_EXL_INVALID, NULL, NULL },
-	{ /* 214 */ CRK5_EXL_INVALID, NULL, NULL },
-	{ /* 215 */ CRK5_EXL_INVALID, NULL, NULL },
-	{ /* 216 */ CRK5_EXL_INVALID, NULL, NULL },
-	{ /* 217 */ CRK5_EXL_INVALID, NULL, NULL },
-	{ /* 218 */ CRK5_EXL_INVALID, NULL, NULL },
-	{ /* 219 */ CRK5_EXL_INVALID, NULL, NULL },
-	{ /* 220 */ CRK5_EXL_INVALID, NULL, NULL },
-	{ /* 221 */ CRK5_EXL_INVALID, NULL, NULL },
-	{ /* 222 */ CRK5_EXL_INVALID, NULL, NULL },
-	{ /* 223 */ CRK5_EXL_INVALID, NULL, NULL },
-	{ /* 224 */ CRK5_EXL_INVALID, NULL, NULL },
-	{ /* 225 */ CRK5_EXL_INVALID, NULL, NULL },
-	{ /* 226 */ CRK5_EXL_INVALID, NULL, NULL },
-	{ /* 227 */ CRK5_EXL_INVALID, NULL, NULL },
-	{ /* 228 */ CRK5_EXL_INVALID, NULL, NULL },
-	{ /* 229 */ CRK5_EXL_INVALID, NULL, NULL },
-	{ /* 230 */ CRK5_EXL_INVALID, NULL, NULL },
-	{ /* 231 */ CRK5_EXL_INVALID, NULL, NULL },
-	{ /* 232 */ CRK5_EXL_INVALID, NULL, NULL },
-	{ /* 233 */ CRK5_EXL_INVALID, NULL, NULL },
-	{ /* 234 */ CRK5_EXL_INVALID, NULL, NULL },
-	{ /* 235 */ CRK5_EXL_INVALID, NULL, NULL },
-	{ /* 236 */ CRK5_EXL_INVALID, NULL, NULL },
-	{ /* 237 */ CRK5_EXL_INVALID, NULL, NULL },
-	{ /* 238 */ CRK5_EXL_INVALID, NULL, NULL },
-	{ /* 239 */ CRK5_EXL_INVALID, NULL, NULL },
-	{ /* 240 */ CRK5_EXL_INVALID, NULL, NULL },
-	{ /* 241 */ CRK5_EXL_INVALID, NULL, NULL },
-	{ /* 242 */ CRK5_EXL_INVALID, NULL, NULL },
-	{ /* 243 */ CRK5_EXL_INVALID, NULL, NULL },
-	{ /* 244 */ CRK5_EXL_INVALID, NULL, NULL },
-	{ /* 245 */ CRK5_EXL_INVALID, NULL, NULL },
-	{ /* 246 */ CRK5_EXL_INVALID, NULL, NULL },
-	{ /* 247 */ CRK5_EXL_INVALID, NULL, NULL },
-	{ /* 248 */ CRK5_EXL_INVALID, NULL, NULL },
-	{ /* 249 */ CRK5_EXL_REJE, "SCON", "Set XOSL state word bits" },
-	{ /* 250 */ CRK5_EXL_REJE, "TCON", "Get XOSL state word" },
-	{ /* 251 */ CRK5_EXL_R4, "END", "End program", },
-	{ /* 252 */ CRK5_EXL_NONE, "BACK", "Run in background" },
-	{ /* 253 */ CRK5_EXL_R4, "ABO", "Abort program" },
-	{ /* 254 */ CRK5_EXL_R4, "KILL", "Kill program" },
-	{ /* 255 */ CRK5_EXL_R4, "EOSL", "End program, output message" }
+	{ /* 128 */ CRK5_EXL_ARG_FIL, CRK5_EXL_FIL_SIZE, "ASG", "Assign stream to file" },
+	{ /* 129 */ CRK5_EXL_ARG_FIL, CRK5_EXL_FIL_SIZE, "CASG", "Create file and assign stream" },
+	{ /* 130 */ CRK5_EXL_ARG_FIL, CRK5_EXL_FIL_SIZE, "SETP", "Set file parameters" },
+	{ /* 131 */ CRK5_EXL_ARG_FIL, CRK5_EXL_FIL_SIZE, "LOAP", "Get file parameters" },
+	{ /* 132 */ CRK5_EXL_ARG_TMEM, CRK5_EXL_TMEM_SIZE, "TMEM", "Add memory for process" },
+	{ /* 133 */ CRK5_EXL_ARG_FIL, CRK5_EXL_FIL_SIZE, "NASG", "Add stream to file" },
+	{ /* 134 */ CRK5_EXL_ARG_STR, CRK5_EXL_STR_SIZE, "ERF", "Remove file" },
+	{ /* 135 */ CRK5_EXL_ARG_STR, CRK5_EXL_STR_SIZE, "ERS", "Remove stream" },
+	{ /* 136 */ CRK5_EXL_ARG_NONE, 0, "ERAS", "Remove streams" },
+	{ /* 137 */ CRK5_EXL_ARG_STR, CRK5_EXL_STR_SIZE, "FBOF", "Seek stream to beginning" },
+	{ /* 138 */ CRK5_EXL_ARG_REC, CRK5_EXL_REC_SIZE, "INPR", "Read record" },
+	{ /* 139 */ CRK5_EXL_ARG_REC, CRK5_EXL_REC_SIZE, "PRIR", "Write record" },
+	{ /* 140 */ CRK5_EXL_ARG_REC, CRK5_EXL_REC_SIZE, "PINP", "Write 2-char and read record" },
+	{ /* 141 */ CRK5_EXL_ARG_REC, CRK5_EXL_REC_SIZE, "PRIN", "Write record no ending char" },
+	{ /* 142 */ CRK5_EXL_ARG_STR, CRK5_EXL_STR_SIZE, "EOF", "Write end char" },
+	{ /* 143 */ CRK5_EXL_ARG_STR, CRK5_EXL_STR_SIZE, "FEOF", "Seek stream to end" },
+	{ /* 144 */ CRK5_EXL_ARG_REC, CRK5_EXL_REC_SIZE, "INAM", "Get parameter from buffer" },
+	{ /* 145 */ CRK5_EXL_ARG_REC, CRK5_EXL_REC_SIZE, "INUM", "Get number from buffer" },
+	{ /* 146 */ CRK5_EXL_ARG_BLOCK, CRK5_EXL_BLOCK_SIZE, "WADR", "Write disk addresses" },
+	{ /* 147 */ CRK5_EXL_ARG_BLOCK, CRK5_EXL_BLOCK_SIZE, "OVL", "Read overlay" },
+	{ /* 148 */ CRK5_EXL_ARG_BLOCK, CRK5_EXL_BLOCK_SIZE, "REAP", "Read from special file" },
+	{ /* 149 */ CRK5_EXL_ARG_BLOCK, CRK5_EXL_BLOCK_SIZE, "WRIP", "Write to process special file" },
+	{ /* 150 */ CRK5_EXL_ARG_BLOCK, CRK5_EXL_BLOCK_SIZE, "READ", "Read block" },
+	{ /* 151 */ CRK5_EXL_ARG_BLOCK, CRK5_EXL_BLOCK_SIZE, "WRIT", "Write block" },
+	{ /* 152 */ CRK5_EXL_ARG_ERR, CRK5_EXL_ERR_SIZE, "OES", "Set own alarm handler" },
+	{ /* 153 */ CRK5_EXL_ARG_NONE, 0, "ERR", "Handle last alarm" },
+	{ /* 154 */ CRK5_EXL_ARG_R4, 0, "CORE", "Allocate memory" },
+	{ /* 155 */ CRK5_EXL_ARG_FIL, CRK5_EXL_FIL_SIZE, "CPRF", "Create special file" },
+	{ /* 156 */ CRK5_EXL_ARG_PROC, CRK5_EXL_PROC_SIZE, "JUMP", "Move process to a separate block" },
+	{ /* 157 */ CRK5_EXL_ARG_DIR, CRK5_EXL_DIR_SIZE, "SDIR", "Set directory parameters" },
+	{ /* 158 */ CRK5_EXL_ARG_DIR, CRK5_EXL_DIR_SIZE, "TDIR", "Get directory parameters" },
+	{ /* 159 */ CRK5_EXL_ARG_DIR, CRK5_EXL_DIR_SIZE, "CDIR", "Change directory parameters" },
+	{ /* 160 */ CRK5_EXL_ARG_PROC, CRK5_EXL_PROC_SIZE, "DEFP", "Define child process" },
+	{ /* 161 */ CRK5_EXL_ARG_PROC, CRK5_EXL_PROC_SIZE, "DELP", "Remove child process" },
+	{ /* 162 */ CRK5_EXL_ARG_PROC, CRK5_EXL_PROC_SIZE, "SREG", "Set child process registers" },
+	{ /* 163 */ CRK5_EXL_ARG_PROC, CRK5_EXL_PROC_SIZE, "TREG", "Get child process registers" },
+	{ /* 164 */ CRK5_EXL_ARG_PROC, CRK5_EXL_PROC_SIZE, "RUNP", "Start child process" },
+	{ /* 165 */ CRK5_EXL_ARG_PROC, CRK5_EXL_PROC_SIZE, "HANG", "Stop child process" },
+	{ /* 166 */ CRK5_EXL_ARG_R4, 0, "TERR", "Check children alarm list" },
+	{ /* 167 */ CRK5_EXL_ARG_R4, 0, "WAIT", "Wait N quants", },
+	{ /* 168 */ CRK5_EXL_ARG_R4, 0, "STOP", "Stop and wait N quants", },
+	{ /* 169 */ CRK5_EXL_ARG_NONE, 0, "RELD", "Release character devices" },
+	{ /* 170 */ CRK5_EXL_ARG_DAT, CRK5_EXL_DAT_SIZE, "DATE", "Get date" },
+	{ /* 171 */ CRK5_EXL_ARG_TIM, CRK5_EXL_TIM_SIZE, "TIME", "Get time" },
+	{ /* 172 */ CRK5_EXL_ARG_NONE, 0, NULL, NULL },
+	{ /* 173 */ CRK5_EXL_ARG_R4, 0, "CHPI", "Change priority",  },
+	{ /* 174 */ CRK5_EXL_ARG_R4, 0, "WAIS", "Semaphore wait",  },
+	{ /* 175 */ CRK5_EXL_ARG_R4, 0, "SIGN", "Semaphore signal",  },
+	{ /* 176 */ CRK5_EXL_ARG_MET, CRK5_EXL_MET_SIZE, "TLAB", "Get disk label" },
+	{ /* 177 */ CRK5_EXL_ARG_PINF, CRK5_EXL_PINF_SIZE, "PINF", "Get process info" },
+	{ /* 178 */ CRK5_EXL_ARG_R4, 0, "CSUM", "Check OS control sum",  },
+	{ /* 179 */ CRK5_EXL_ARG_R4, 0, "CSYS", "Change system" },
+	{ /* 180 */ CRK5_EXL_ARG_R4, 0, "UNL", "Unloaddisk area" },
+	{ /* 181 */ CRK5_EXL_ARG_R4, 0, "LOD", "Load disk area" },
+	{ /* 182 */ CRK5_EXL_ARG_STR, CRK5_EXL_STR_SIZE, "TAKS", "Take stream semaphore" },
+	{ /* 183 */ CRK5_EXL_ARG_STR, CRK5_EXL_STR_SIZE, "RELS", "Release stream semaphore" },
+	{ /* 184 */ CRK5_EXL_ARG_R4, 0, "GMEM", "Add memory segmets" },
+	{ /* 185 */ CRK5_EXL_ARG_R4, 0, "RMEM", "Free memory segments" },
+	{ /* 186 */ CRK5_EXL_ARG_TABL, 0, "LRAM", "Get RAM file parameters" },
+	{ /* 187 */ CRK5_EXL_ARG_NONE, 0, NULL, NULL },
+	{ /* 188 */ CRK5_EXL_ARG_NONE, 0, NULL, NULL },
+	{ /* 189 */ CRK5_EXL_ARG_PI, CRK5_EXL_PI_SIZE, "OPPI", "PI operation" },
+	{ /* 190 */ CRK5_EXL_ARG_PI, CRK5_EXL_PI_SIZE, "WFPI", "Get PI interrupt" },
+	{ /* 191 */ CRK5_EXL_ARG_CAM, CRK5_EXL_CAM_SIZE, "CAMAC", "CAMAC operation" },
+	{ /* 192 */ CRK5_EXL_ARG_MT, CRK5_EXL_MT_SIZE, "RWMT", "Rewind tape to the beginning" },
+	{ /* 193 */ CRK5_EXL_ARG_MT, CRK5_EXL_MT_SIZE, "FBMT", "Rewind tape by one file" },
+	{ /* 194 */ CRK5_EXL_ARG_MT, CRK5_EXL_MT_SIZE, "FFMT", "Forward tape by one file" },
+	{ /* 195 */ CRK5_EXL_ARG_MT, CRK5_EXL_MT_SIZE, "BBMT", "Rewind tape one block" },
+	{ /* 196 */ CRK5_EXL_ARG_MT, CRK5_EXL_MT_SIZE, "BFMT", "Forward tape one block" },
+	{ /* 197 */ CRK5_EXL_ARG_MT, CRK5_EXL_MT_SIZE, "FMMT", "Write file mark" },
+	{ /* 198 */ CRK5_EXL_ARG_MT, CRK5_EXL_MT_SIZE, "REMT", "Read block from tape" },
+	{ /* 199 */ CRK5_EXL_ARG_MT, CRK5_EXL_MT_SIZE, "WRMT", "Write block to tape" },
+	{ /* 200 */ CRK5_EXL_ARG_NONE, 0, NULL, NULL },
+	{ /* 201 */ CRK5_EXL_ARG_NONE, 0, NULL, NULL },
+	{ /* 202 */ CRK5_EXL_ARG_NONE, 0, NULL, NULL },
+	{ /* 203 */ CRK5_EXL_ARG_NONE, 0, NULL, NULL },
+	{ /* 204 */ CRK5_EXL_ARG_NONE, 0, NULL, NULL },
+	{ /* 205 */ CRK5_EXL_ARG_NONE, 0, NULL, NULL },
+	{ /* 206 */ CRK5_EXL_ARG_NONE, 0, NULL, NULL },
+	{ /* 207 */ CRK5_EXL_ARG_NONE, 0, NULL, NULL },
+	{ /* 208 */ CRK5_EXL_ARG_NONE, 0, NULL, NULL },
+	{ /* 209 */ CRK5_EXL_ARG_NONE, 0, NULL, NULL },
+	{ /* 210 */ CRK5_EXL_ARG_NONE, 0, NULL, NULL },
+	{ /* 211 */ CRK5_EXL_ARG_NONE, 0, NULL, NULL },
+	{ /* 212 */ CRK5_EXL_ARG_NONE, 0, NULL, NULL },
+	{ /* 213 */ CRK5_EXL_ARG_NONE, 0, NULL, NULL },
+	{ /* 214 */ CRK5_EXL_ARG_NONE, 0, NULL, NULL },
+	{ /* 215 */ CRK5_EXL_ARG_NONE, 0, NULL, NULL },
+	{ /* 216 */ CRK5_EXL_ARG_NONE, 0, NULL, NULL },
+	{ /* 217 */ CRK5_EXL_ARG_NONE, 0, NULL, NULL },
+	{ /* 218 */ CRK5_EXL_ARG_NONE, 0, NULL, NULL },
+	{ /* 219 */ CRK5_EXL_ARG_NONE, 0, NULL, NULL },
+	{ /* 220 */ CRK5_EXL_ARG_NONE, 0, NULL, NULL },
+	{ /* 221 */ CRK5_EXL_ARG_NONE, 0, NULL, NULL },
+	{ /* 222 */ CRK5_EXL_ARG_NONE, 0, NULL, NULL },
+	{ /* 223 */ CRK5_EXL_ARG_NONE, 0, NULL, NULL },
+	{ /* 224 */ CRK5_EXL_ARG_NONE, 0, NULL, NULL },
+	{ /* 225 */ CRK5_EXL_ARG_NONE, 0, NULL, NULL },
+	{ /* 226 */ CRK5_EXL_ARG_NONE, 0, NULL, NULL },
+	{ /* 227 */ CRK5_EXL_ARG_NONE, 0, NULL, NULL },
+	{ /* 228 */ CRK5_EXL_ARG_NONE, 0, NULL, NULL },
+	{ /* 229 */ CRK5_EXL_ARG_NONE, 0, NULL, NULL },
+	{ /* 230 */ CRK5_EXL_ARG_NONE, 0, NULL, NULL },
+	{ /* 231 */ CRK5_EXL_ARG_NONE, 0, NULL, NULL },
+	{ /* 232 */ CRK5_EXL_ARG_NONE, 0, NULL, NULL },
+	{ /* 233 */ CRK5_EXL_ARG_NONE, 0, NULL, NULL },
+	{ /* 234 */ CRK5_EXL_ARG_NONE, 0, NULL, NULL },
+	{ /* 235 */ CRK5_EXL_ARG_NONE, 0, NULL, NULL },
+	{ /* 236 */ CRK5_EXL_ARG_NONE, 0, NULL, NULL },
+	{ /* 237 */ CRK5_EXL_ARG_NONE, 0, NULL, NULL },
+	{ /* 238 */ CRK5_EXL_ARG_NONE, 0, NULL, NULL },
+	{ /* 239 */ CRK5_EXL_ARG_NONE, 0, NULL, NULL },
+	{ /* 240 */ CRK5_EXL_ARG_NONE, 0, NULL, NULL },
+	{ /* 241 */ CRK5_EXL_ARG_NONE, 0, NULL, NULL },
+	{ /* 242 */ CRK5_EXL_ARG_NONE, 0, NULL, NULL },
+	{ /* 243 */ CRK5_EXL_ARG_NONE, 0, NULL, NULL },
+	{ /* 244 */ CRK5_EXL_ARG_NONE, 0, NULL, NULL },
+	{ /* 245 */ CRK5_EXL_ARG_NONE, 0, NULL, NULL },
+	{ /* 246 */ CRK5_EXL_ARG_NONE, 0, NULL, NULL },
+	{ /* 247 */ CRK5_EXL_ARG_NONE, 0, NULL, NULL },
+	{ /* 248 */ CRK5_EXL_ARG_NONE, 0, NULL, NULL },
+	{ /* 249 */ CRK5_EXL_ARG_REJE, 0, "SCON", "Set XOSL state word bits" },
+	{ /* 250 */ CRK5_EXL_ARG_REJE, 0, "TCON", "Get XOSL state word" },
+	{ /* 251 */ CRK5_EXL_ARG_R4, 0, "END", "End program", },
+	{ /* 252 */ CRK5_EXL_ARG_NONE, 0, "BACK", "Run in background" },
+	{ /* 253 */ CRK5_EXL_ARG_R4, 0, "ABO", "Abort program" },
+	{ /* 254 */ CRK5_EXL_ARG_R4, 0, "KILL", "Kill program" },
+	{ /* 255 */ CRK5_EXL_ARG_R4, 0, "EOSL", "End program, output message" }
 };
 
 // -----------------------------------------------------------------------
@@ -166,7 +167,7 @@ const struct crk5_exl * crk5_get_exl(int num)
 	if ((num == 187) || (num == 188))  return &crk5_exl_invalid;
 	if ((num > 199) && (num < 249)) return &crk5_exl_invalid;
 
-	return crk5_exl_list + num - CRK5_EXL_MIN;
+	return crk5_exl_list + (num - CRK5_EXL_MIN);
 }
 
 // -----------------------------------------------------------------------
@@ -206,7 +207,7 @@ struct crk5_exl_tmem * crk5_exl_tmem_unpack(uint16_t *data)
 	exl->stream_id = data[1];
 	exl->addr = data[2];
 	// data[3] - unused
-	exl->block_num = data[4];
+	exl->seg = data[4];
 
 	return exl;
 }
@@ -215,7 +216,6 @@ struct crk5_exl_tmem * crk5_exl_tmem_unpack(uint16_t *data)
 void crk5_exl_tmem_delete(struct crk5_exl_tmem *exl)
 {
 	if (!exl) return;
-
 	free(exl);
 }
 
@@ -235,6 +235,7 @@ struct crk5_exl_dat * crk5_exl_dat_unpack(uint16_t *data)
 // -----------------------------------------------------------------------
 void crk5_exl_dat_delete(struct crk5_exl_dat *exl)
 {
+	if (!exl) return;
 	free(exl);
 }
 
@@ -254,6 +255,7 @@ struct crk5_exl_tim * crk5_exl_tim_unpack(uint16_t *data)
 // -----------------------------------------------------------------------
 void crk5_exl_tim_delete(struct crk5_exl_tim *exl)
 {
+	if (!exl) return;
 	free(exl);
 }
 
@@ -267,7 +269,7 @@ struct crk5_exl_proc * crk5_exl_proc_unpack(uint16_t *data)
 	exl->num = data[1];
 	exl->ic = data[2];
 	exl->r0 = data[3];
-	exl->prio_state = data[4];
+	exl->prio_sr = data[4];
 	for (int i=0 ; i<7 ; i++) {
 		exl->uregs[i] = data[i+5];
 	}
@@ -278,6 +280,7 @@ struct crk5_exl_proc * crk5_exl_proc_unpack(uint16_t *data)
 // -----------------------------------------------------------------------
 void crk5_exl_proc_delete(struct crk5_exl_proc *exl)
 {
+	if (!exl) return;
 	free(exl);
 }
 
@@ -287,7 +290,8 @@ struct crk5_exl_pinf *crk5_exl_pinf_unpack(uint16_t *data)
 	struct crk5_exl_pinf *exl = malloc(sizeof(struct crk5_exl_pinf));
 	if (!exl) return NULL;
 
-	exl->gen = data[0];
+	exl->sys_ver_maj = (data[0] & 0b0000000001111111);
+	exl->sys_ver_min = (data[0] & 0b1111111110000000) >> 7;
 	exl->seg_total = data[1] >> 8;
 	exl->user_rights = data[1] & 0xff;
 	exl->prio = data[2];
@@ -344,7 +348,7 @@ struct crk5_exl_str * crk5_exl_str_unpack(uint16_t *data)
 	return exl;
 }
 // -----------------------------------------------------------------------
-void crk4_exl_str_delete(struct crk5_exl_str *exl)
+void crk5_exl_str_delete(struct crk5_exl_str *exl)
 {
 	if (!exl) return;
 	free(exl);
@@ -357,11 +361,17 @@ struct crk5_exl_dir * crk5_exl_dir_unpack(uint16_t *data)
 	if (!exl) return NULL;
 
 	exl->count = data[0];
-	exl->user_id = malloc(sizeof(uint16_t) * exl->count);
-	exl->dir_id = malloc(sizeof(uint16_t) * exl->count);
-	for (int i=0 ; i<exl->count ; i++) {
-		exl->user_id[i] = data[1+i*2+0];
-		exl->dir_id[i] = data[1+i*2+1];
+
+	if (exl->count > 16) {
+		exl->user_id = NULL;
+		exl->dir_id = NULL;
+	} else {
+		exl->user_id = malloc(sizeof(uint16_t) * exl->count);
+		exl->dir_id = malloc(sizeof(uint16_t) * exl->count);
+		for (int i=0 ; i<exl->count ; i++) {
+			exl->user_id[i] = data[1+i*2+0];
+			exl->dir_id[i] = data[1+i*2+1];
+		}
 	}
 
 	return exl;
@@ -384,9 +394,9 @@ struct crk5_exl_met * crk5_exl_met_unpack(uint16_t *data)
 
 	exl->disk_id = data[0];
 	exl->disk_name = r40_to_ascii(data, 1, NULL);
-	exl->dicdic_addr = data[1];
-	exl->fildic_addr = data[2];
-	exl->mapa_addr = data[3];
+	exl->dicdic = data[1];
+	exl->fildic = data[2];
+	exl->map = data[3];
 	exl->len = data[4];
 
 	return exl;
@@ -406,11 +416,11 @@ struct crk5_exl_rec * crk5_exl_rec_unpack(uint16_t *data)
 	struct crk5_exl_rec *exl = malloc(sizeof(struct crk5_exl_rec));
 	if (!exl) return NULL;
 
-	exl->char_n = data[0];
+	exl->position = data[0];
 	exl->stream_id = data[1];
 	exl->buf_addr = data[2];
 	exl->end_char = data[3] >> 8;
-	exl->len = data[3] & 0xff;
+	exl->max_len = data[3] & 0xff;
 	exl->prechars[0] = data[4] >> 8;
 	exl->prechars[1] = data[4] & 0xff;
 	exl->prechars[2] = 0;

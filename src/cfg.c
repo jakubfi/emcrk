@@ -18,7 +18,7 @@
 #include <inttypes.h>
 #include <stdlib.h>
 
-#include "emcrk/cfg.h"
+#include "cfg.h"
 
 // -----------------------------------------------------------------------
 struct crk5_cfg_mem * crk5_cfg_mem_unpack(uint16_t *d)

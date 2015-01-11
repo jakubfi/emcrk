@@ -20,7 +20,7 @@
 #include <stdlib.h>
 #include <getopt.h>
 
-#include "emcrk/r40.h"
+#include "r40.h"
 
 enum modes { NONE, ENCODE, DECODE };
 

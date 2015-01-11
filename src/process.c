@@ -19,8 +19,8 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "emcrk/process.h"
-#include "emcrk/r40.h"
+#include "process.h"
+#include "r40.h"
 
 // -----------------------------------------------------------------------
 struct crk5_process * crk5_process_unpack(uint16_t *ptr, uint16_t addr, int kern_mod)

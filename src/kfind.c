@@ -21,7 +21,7 @@
 #include <sys/stat.h>
 #include <unistd.h>
 
-#include "emcrk/kfind.h"
+#include "kfind.h"
 
 #define PAT_ANY -2
 #define PAT_END -1

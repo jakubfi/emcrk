@@ -22,7 +22,7 @@
 #include <sys/stat.h>
 #include <arpa/inet.h>
 
-#include "emcrk/kfind.h"
+#include "kfind.h"
 
 // -----------------------------------------------------------------------
 static void help()
