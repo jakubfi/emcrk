@@ -203,7 +203,7 @@ struct crk5_exl_pinf {
 struct crk5_exl_err {
 	uint16_t proc_addr;
 	uint16_t alarm_addr;
-	uint8_t alarm_nr;
+	uint16_t alarm_nr;
 };
 
 struct crk5_exl_str {
