@@ -68,6 +68,29 @@ static int r40_to_char(unsigned i)
 }
 
 // -----------------------------------------------------------------------
+int r40_valid_char(char ch, int allow_lowercase)
+{
+	if (char_to_r40(ch) != -1) {
+		return 1;
+	} else {
+		return 0;
+	}
+}
+
+// -----------------------------------------------------------------------
+int r40_valid_str(char *str, int allow_lowercase)
+{
+	while (*str) {
+		if (char_to_r40(*str) == -1) {
+			return 0;
+		}
+		str++;
+	}
+
+	return 1;
+}
+
+// -----------------------------------------------------------------------
 uint16_t * ascii_to_r40(char *ascii, int *r40_len, uint16_t *r40)
 {
 	char *s = ascii;
