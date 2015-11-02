@@ -110,7 +110,9 @@ uint16_t * ascii_to_r40(char *ascii, int *r40_len, uint16_t *r40)
 		*r40_len = 0;
 	}
 
-	*r40p = 0;
+	for (int i=0 ; i<result_len ; i++) {
+		dest[i] = 0;
+	}
 
 	while (s && *s) {
 		int ch = char_to_r40(*s);
@@ -129,7 +131,6 @@ uint16_t * ascii_to_r40(char *ascii, int *r40_len, uint16_t *r40)
 
 		if (mul == 1) {
 			r40p++;
-			*r40p = 0;
 			mul = 1600;
 		} else {
 			mul /= 40;
