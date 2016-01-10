@@ -49,6 +49,10 @@ static const uint16_t start_addr_lim = 0x00a0;
 static const int chcs_pat[] = { 0xd480, 0x40c0, PAT_ANY, 0x4240, ENDSYS, 0x88c1, PAT_END };
 static const uint16_t chcs_addr_lim = 0x0070;
 
+// COPSYS code: LA ???, RA r1, LW r1, [???]
+static const int copsys_pat[] = { 0xf480, PAT_ANY, 0xf881, 0x4240, PAT_END };
+
+
 // -----------------------------------------------------------------------
 static int pat_search(uint16_t *buf, off_t len, const int *pattern)
 {
@@ -97,6 +101,13 @@ struct crk5_kern_result * crk5_kern_find(uint16_t *buf, off_t len)
 
 	uint16_t *kstart = buf + kern->offset;
 	off_t klen = len - kern->offset;
+
+	// get kernel version
+	off_t copsys_pos = pat_search(kstart, klen, copsys_pat);
+	off_t sysnum_offset = kstart[copsys_pos-1] & 0b111111;
+	uint16_t kversion = kstart[copsys_pos-sysnum_offset];
+	kern->vmaj = (kversion & 0b0000000001111111);
+	kern->vmin = (kversion & 0b1111111110000000) >> 7;
 
 	// check if this kernel is for modified cpu
 	uint16_t int5_vec = kstart[0x40+5];

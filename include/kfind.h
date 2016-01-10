@@ -22,6 +22,8 @@
 
 struct crk5_kern_result {
 	off_t offset;				// kernel image start (words into buffer)
+	int vmaj;					// kernel major version
+	int vmin;					// kernel minor version
 	int raw;					// is the kernel raw or installed?
 	int mod;					// is the kernel for modified (MX-16) cpu?
 	uint16_t entry_point;		// current entry point (initial jump destination address to either START or COPSY0)

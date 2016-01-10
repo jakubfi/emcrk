@@ -76,10 +76,12 @@ int main(int argc, char **argv)
 	while (tkern) {
 		printf(
 			"kernel @ %li bytes\n"
-			"	CPU: %s\n"
+			"	version: %i/%i for CPU: %s\n"
 			"	current entry point: 0x%04x, start addr: 0x%04x (kernel is %s)\n"
 			"	cksum @ 0x%04x = 0x%04x, computed = 0x%04x -> %s\n",
 			tkern->offset,
+			tkern->vmaj,
+			tkern->vmin,
 			tkern->mod ? "MX-16" : "MERA-400",
 			tkern->entry_point,
 			tkern->start_addr,
