@@ -1,16 +1,11 @@
 cmake_minimum_required(VERSION 2.8.4)
 project(emcrk C)
-
+include(appversion.cmake)
 set(DEBUG 1)
-
-set(EMCRK_VERSION_MAJOR 0)
-set(EMCRK_VERSION_MINOR 0)
-set(EMCRK_VERSION_PATCH 1)
-set(EMCRK_VERSION ${EMCRK_VERSION_MAJOR}.${EMCRK_VERSION_MINOR}.${EMCRK_VERSION_PATCH})
 
 include_directories(${CMAKE_SOURCE_DIR}/include)
 
-add_definitions(-Wall -std=c99 -DEMCRK_VERSION="${EMCRK_VERSION}")
+add_definitions(-Wall -std=c99 -DEMCRK_VERSION="${APP_VERSION}")
 
 if(DEBUG)
 	add_definitions(-DDEBUG -g -O0)
