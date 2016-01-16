@@ -10,7 +10,7 @@ add_library(emcrk-lib SHARED
 
 set_target_properties(emcrk-lib PROPERTIES
 	OUTPUT_NAME "emcrk"
-	SOVERSION ${EMCRK_VERSION_MAJOR}.${EMCRK_VERSION_MINOR}
+	SOVERSION ${APP_VERSION_MAJOR}.${APP_VERSION_MINOR}
 )
 
 install(TARGETS emcrk-lib
