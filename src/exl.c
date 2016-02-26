@@ -178,6 +178,7 @@ struct crk5_exl_fil * crk5_exl_fil_unpack(uint16_t *data)
 
 	exl->err = data[0];
 	exl->stream_id = data[1];
+	exl->stream_name = r40_to_ascii(data+1, 1, NULL);
 	exl->type = data[2];
 	exl->len = data[3];
 	exl->param[0] = data[4];
@@ -194,6 +195,7 @@ struct crk5_exl_fil * crk5_exl_fil_unpack(uint16_t *data)
 void crk5_exl_fil_delete(struct crk5_exl_fil *exl)
 {
 	if (!exl) return;
+	free(exl->stream_name);
 	free(exl);
 }
 
@@ -205,6 +207,7 @@ struct crk5_exl_tmem * crk5_exl_tmem_unpack(uint16_t *data)
 
 	exl->err = data[0];
 	exl->stream_id = data[1];
+	exl->stream_name = r40_to_ascii(data+1, 1, NULL);
 	exl->addr = data[2];
 	// data[3] - unused
 	exl->seg = data[4];
@@ -216,6 +219,7 @@ struct crk5_exl_tmem * crk5_exl_tmem_unpack(uint16_t *data)
 void crk5_exl_tmem_delete(struct crk5_exl_tmem *exl)
 {
 	if (!exl) return;
+	free(exl->stream_name);
 	free(exl);
 }
 
@@ -344,6 +348,7 @@ struct crk5_exl_str * crk5_exl_str_unpack(uint16_t *data)
 
 	exl->err = data[0];
 	exl->stream_id = data[1];
+	exl->stream_name = r40_to_ascii(data+1, 1, NULL);
 
 	return exl;
 }
@@ -351,6 +356,7 @@ struct crk5_exl_str * crk5_exl_str_unpack(uint16_t *data)
 void crk5_exl_str_delete(struct crk5_exl_str *exl)
 {
 	if (!exl) return;
+	free(exl->stream_name);
 	free(exl);
 }
 
@@ -418,6 +424,7 @@ struct crk5_exl_rec * crk5_exl_rec_unpack(uint16_t *data)
 
 	exl->position = data[0];
 	exl->stream_id = data[1];
+	exl->stream_name = r40_to_ascii(data+1, 1, NULL);
 	exl->buf_addr = data[2];
 	exl->end_char = data[3] >> 8;
 	exl->max_len = data[3] & 0xff;
@@ -432,6 +439,7 @@ struct crk5_exl_rec * crk5_exl_rec_unpack(uint16_t *data)
 void crk5_exl_rec_delete(struct crk5_exl_rec *exl)
 {
 	if (!exl) return;
+	free(exl->stream_name);
 	free(exl);
 }
 
@@ -443,6 +451,7 @@ struct crk5_exl_block * crk5_exl_block_unpack(uint16_t *data)
 
 	exl->transmitted = data[0];
 	exl->stream_id = data[1];
+	exl->stream_name = r40_to_ascii(data+1, 1, NULL);
 	exl->addr = data[2];
 	exl->count = data[3];
 	exl->start_sector = data[4];
@@ -454,6 +463,7 @@ struct crk5_exl_block * crk5_exl_block_unpack(uint16_t *data)
 void crk5_exl_block_delete(struct crk5_exl_block *exl)
 {
 	if (!exl) return;
+	free(exl->stream_name);
 	free(exl);
 }
 

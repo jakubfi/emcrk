@@ -147,6 +147,7 @@ struct crk5_exl {
 struct crk5_exl_fil {
 	int16_t err;
 	uint16_t stream_id;
+	char *stream_name;
 	uint16_t type;
 	uint16_t len;
 	uint16_t param[2];
@@ -160,6 +161,7 @@ struct crk5_exl_fil {
 struct crk5_exl_tmem {
 	int16_t err;
 	uint16_t stream_id;
+	char *stream_name;
 	uint16_t addr;
 	uint16_t seg;
 };
@@ -209,6 +211,7 @@ struct crk5_exl_err {
 struct crk5_exl_str {
 	int16_t err;
 	uint16_t stream_id;
+	char *stream_name;
 };
 
 struct crk5_exl_dir {
@@ -229,6 +232,7 @@ struct crk5_exl_met {
 struct crk5_exl_rec {
 	uint16_t position;
 	uint16_t stream_id;
+	char *stream_name;
 	uint16_t buf_addr;
 	uint8_t end_char;
 	uint8_t max_len;
@@ -238,6 +242,7 @@ struct crk5_exl_rec {
 struct crk5_exl_block {
 	uint16_t transmitted;
 	uint16_t stream_id;
+	char *stream_name;
 	uint16_t addr;
 	uint16_t count;
 	uint16_t start_sector;
