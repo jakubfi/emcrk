@@ -14,9 +14,9 @@ set_target_properties(emcrk-lib PROPERTIES
 )
 
 install(TARGETS emcrk-lib
-	LIBRARY DESTINATION lib
-	ARCHIVE DESTINATION lib
-	PUBLIC_HEADER DESTINATION include
+	LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
+	ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
+	PUBLIC_HEADER DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
 )
 
 install(FILES
@@ -26,7 +26,7 @@ install(FILES
 	${CMAKE_SOURCE_DIR}/include/cfg.h
 	${CMAKE_SOURCE_DIR}/include/obj.h
 	${CMAKE_SOURCE_DIR}/include/exl.h
-	DESTINATION include/emcrk
+	DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/emcrk
 )
 
 add_executable(crkfind
@@ -41,11 +41,11 @@ target_link_libraries(crkfind emcrk-lib)
 target_link_libraries(r40 emcrk-lib)
 
 install(TARGETS crkfind
-	RUNTIME DESTINATION bin
+	RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
 )
 
 install(TARGETS r40
-	RUNTIME DESTINATION bin
+	RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
 )
 
 # vim: tabstop=4

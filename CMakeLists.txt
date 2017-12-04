@@ -1,6 +1,9 @@
 cmake_minimum_required(VERSION 2.8.4)
 project(emcrk C)
+
+include(GNUInstallDirs)
 include(appversion.cmake)
+
 set(DEBUG 1)
 
 include_directories(${CMAKE_SOURCE_DIR}/include)
@@ -28,7 +31,7 @@ configure_file(
 install(FILES
 	${PROJECT_BINARY_DIR}/emcrk-config.cmake
 	${PROJECT_BINARY_DIR}/emcrk-config-version.cmake
-	DESTINATION lib/emcrk
+	DESTINATION ${CMAKE_INSTALL_LIBDIR}/emcrk
 	COMPONENT dev
 )
 
