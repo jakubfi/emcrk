@@ -20,12 +20,20 @@
 
 #include <inttypes.h>
 
+#ifdef __cplusplus
+extern "C"
+#endif
+
 int r40len(char *s);
 uint16_t * ascii_to_r40(char *ascii, unsigned *r40_len, uint16_t *r40);
 char * r40_to_ascii(uint16_t *r40, unsigned r40_len, char *ascii);
 
 int r40_valid_char(char ch);
 int r40_valid_str(char *str);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif
 

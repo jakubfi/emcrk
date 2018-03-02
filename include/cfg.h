@@ -20,6 +20,10 @@
 
 #include <inttypes.h>
 
+#ifdef __cplusplus
+extern "C"
+#endif
+
 // -----------------------------------------------------------------------
 struct crk5_cfg_mem {
 	int silicon;
@@ -140,6 +144,9 @@ struct crk5_cfg {
 	struct crk5_cfg_chdev *chdev[15];
 };
 
+#ifdef __cplusplus
+}
 #endif
 
+#endif
 // vim: tabstop=4 shiftwidth=4 autoindent

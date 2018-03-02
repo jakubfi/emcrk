@@ -20,6 +20,10 @@
 
 #include <inttypes.h>
 
+#ifdef __cplusplus
+extern "C"
+#endif
+
 struct crk5_kern_result {
 	off_t offset;				// kernel image start (words into buffer)
 	int vmaj;					// kernel major version
@@ -37,6 +41,10 @@ struct crk5_kern_result {
 struct crk5_kern_result * crk5_kern_find(uint16_t *buf, off_t len);
 struct crk5_kern_result * crk5_kern_findall(uint16_t *buf, off_t len);
 void crk5_kern_res_drop(struct crk5_kern_result *kern);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif
 

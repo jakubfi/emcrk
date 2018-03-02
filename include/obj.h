@@ -21,10 +21,14 @@
 #include <inttypes.h>
 #include <stdlib.h>
 
+#ifdef __cplusplus
+extern "C"
+#endif
+
 #define CRK5_SPACE_STR 0x79f2
 #define CRK5_SPACE_DEV 0x19de
-#define CRK5_SPAVE_MES 0x521b
-#define CRK5_SPAVE_RAM 0x70b5
+#define CRK5_SPACE_MES 0x521b
+#define CRK5_SPACE_RAM 0x70b5
 
 enum crk5_obj_types {
 	CRK5_OBJ_INVALID,
@@ -84,6 +88,10 @@ struct crk5_obj_mes * crk5_obj_mes_unpack(uint16_t *data);
 void crk5_obj_mes_delete(struct crk5_obj_mes *obj);
 struct crk5_obj_mem * crk5_obj_mem_unpack(uint16_t *data);
 void crk5_obj_mem_delete(struct crk5_obj_mem *obj);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif
 

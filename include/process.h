@@ -20,6 +20,10 @@
 
 #include <inttypes.h>
 
+#ifdef __cplusplus
+extern "C"
+#endif
+
 /*
 CROOK-5 v8 process structure for N and P kernels:
 
@@ -104,6 +108,10 @@ struct crk5_process {
 
 struct crk5_process * crk5_process_unpack(uint16_t *ptr, uint16_t addr, int kern_mod);
 void crk5_process_delete(struct crk5_process *ptr);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif
 

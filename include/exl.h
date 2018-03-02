@@ -20,6 +20,10 @@
 
 #include <inttypes.h>
 
+#ifdef __cplusplus
+extern "C"
+#endif
+
 enum crk5_exls_codes {
 	CRK5_EXL_ASG = 128,
 	CRK5_EXL_CASG,
@@ -311,6 +315,10 @@ struct crk5_exl_pi * crk5_exl_pi_unpack(uint16_t *data);
 void crk5_exl_pi_delete(struct crk5_exl_pi *exl);
 struct crk5_exl_cam * crk5_exl_cam_unpack(uint16_t *data);
 void crk5_exl_cam_delete(struct crk5_exl_cam *exl);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif
 

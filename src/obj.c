@@ -30,10 +30,10 @@ void * crk5_obj_unpack(uint16_t *data, int *type)
 	} else if (data[0] == CRK5_SPACE_DEV) {
 		*type = CRK5_OBJ_DEVICE;
 		return crk5_obj_dev_unpack(data);
-	} else if (data[0] == CRK5_SPAVE_MES) {
+	} else if (data[0] == CRK5_SPACE_MES) {
 		*type = CRK5_OBJ_MESSAGE;
 		return crk5_obj_mes_unpack(data);
-	} else if (data[0] == CRK5_SPAVE_RAM) {
+	} else if (data[0] == CRK5_SPACE_RAM) {
 		*type = CRK5_OBJ_MEM;
 		return crk5_obj_mem_unpack(data);
 	} else if (data[3] == 0) {
