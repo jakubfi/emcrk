@@ -22,7 +22,7 @@
 #include <stdlib.h>
 
 #ifdef __cplusplus
-extern "C"
+extern "C" {
 #endif
 
 #define CRK5_SPACE_STR 0x79f2

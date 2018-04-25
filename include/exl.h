@@ -21,7 +21,7 @@
 #include <inttypes.h>
 
 #ifdef __cplusplus
-extern "C"
+extern "C" {
 #endif
 
 enum crk5_exls_codes {

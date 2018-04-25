@@ -21,7 +21,7 @@
 #include <inttypes.h>
 
 #ifdef __cplusplus
-extern "C"
+extern "C" {
 #endif
 
 struct crk5_kern_result {
