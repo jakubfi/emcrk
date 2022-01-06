@@ -19,6 +19,7 @@
 #define CRK5_KFIND_H
 
 #include <inttypes.h>
+#include <stdbool.h>
 
 #ifdef __cplusplus
 extern "C" {
@@ -40,6 +41,7 @@ struct crk5_kern_result {
 
 struct crk5_kern_result * crk5_kern_find(uint16_t *buf, off_t len);
 struct crk5_kern_result * crk5_kern_findall(uint16_t *buf, off_t len);
+struct crk5_kern_result * crk5_kern_findall_file(FILE *f, bool swap_bytes);
 void crk5_kern_res_drop(struct crk5_kern_result *kern);
 
 #ifdef __cplusplus

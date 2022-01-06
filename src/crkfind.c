@@ -1,4 +1,4 @@
-//  Copyright (c) 2014 Jakub Filipowicz <jakubf@gmail.com>
+//  Copyright (c) 2014, 2022 Jakub Filipowicz <jakubf@gmail.com>
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -15,12 +15,9 @@
 //  Foundation, Inc.,
 //  51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 
-#include <inttypes.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <sys/types.h>
-#include <sys/stat.h>
-#include <arpa/inet.h>
+#include <stdbool.h>
 
 #include "kfind.h"
 
@@ -28,7 +25,7 @@
 static void help()
 {
 	fprintf(stderr,
-		"crkfind - Look for CROOK-5 kernels in a file.\n"
+		"crkfind - Search for CROOK-5 kernels in a file.\n"
 		"Usage: crkfind filename\n"
 	);
 }
@@ -36,41 +33,18 @@ static void help()
 // -----------------------------------------------------------------------
 int main(int argc, char **argv)
 {
-	off_t words;
-
-	struct stat sb;
-
 	if (argc != 2) {
 		help();
-		exit(1);
-	}
-
-	if (stat(argv[1], &sb) == -1) {
-		fprintf(stderr, "Cannot stat file: %s\n", argv[1]);
-		exit(1);
-	}
-
-	uint16_t *buf = malloc(sb.st_size);
-	if (!buf) {
-		fprintf(stderr, "Memory allocation error.\n");
 		exit(1);
 	}
 
 	FILE *f = fopen(argv[1], "r");
 	if (!f) {
 		fprintf(stderr, "Cannot open file %s for reading.\n", argv[1]);
-		free(buf);
 		exit(1);
 	}
 
-	words = fread(buf, 2, sb.st_size/2, f);
-	fclose(f);
-
-	for (int i=0 ; i<words ; i++) {
-		buf[i] = ntohs(buf[i]);
-	}
-
-	struct crk5_kern_result *kern = crk5_kern_findall(buf, words);
+	struct crk5_kern_result *kern = crk5_kern_findall_file(f, true);
 	struct crk5_kern_result *tkern = kern;
 
 	while (tkern) {
@@ -95,7 +69,6 @@ int main(int argc, char **argv)
 	}
 
 	crk5_kern_res_drop(kern);
-	free(buf);
 	return 0;
 }
 
