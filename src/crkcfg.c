@@ -171,16 +171,16 @@ void cfg_dump(struct crk5_cfg *cfg)
 	}
 
 	for (int i=0 ; i<CRK5_CFG_LINE_SLOTS ; i++) {
-		printf("line.%i.configured = %i\n", i, cfg->line[i].configured);
-		if (cfg->line[i].configured) {
-			printf("line.%i.multix = %i\n", i, cfg->line[i].multix);
-			if (cfg->line[i].multix) {
-				printf("line.%i.dir = %s\n", i, crk5_cfg_line_dir_name(cfg->line[i].dir));
-				printf("line.%i.used = %i\n", i, cfg->line[i].used);
-				printf("line.%i.type = %s\n", i, crk5_cfg_line_type_name(cfg->line[i].type));
+		printf("lines.%i.configured = %i\n", i, cfg->lines[i].configured);
+		if (cfg->lines[i].configured) {
+			printf("lines.%i.multix = %i\n", i, cfg->lines[i].multix);
+			if (cfg->lines[i].multix) {
+				printf("lines.%i.dir = %s\n", i, crk5_cfg_line_dir_name(cfg->lines[i].dir));
+				printf("lines.%i.used = %i\n", i, cfg->lines[i].used);
+				printf("lines.%i.type = %s\n", i, crk5_cfg_line_type_name(cfg->lines[i].type));
 			}
-			printf("line.%i.protocol = %s\n", i, crk5_cfg_line_protocol_name(cfg->line[i].protocol));
-			printf("line.%i.line_count = %i\n", i, cfg->line[i].line_count);
+			printf("lines.%i.protocol = %s\n", i, crk5_cfg_line_protocol_name(cfg->lines[i].protocol));
+			printf("lines.%i.line_count = %i\n", i, cfg->lines[i].count);
 		}
 	}
 }

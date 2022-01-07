@@ -232,7 +232,7 @@ struct crk5_kern_result * crk5_kern_findall_file(FILE *f, bool swap_bytes)
 
 	struct crk5_kern_result *ret = _crk5_kern_findall(buf, sb.st_size/2, swap_bytes);
 
-    munmap(buf, sb.st_size);
+	munmap(buf, sb.st_size);
 	return ret;
 }
 

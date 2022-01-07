@@ -165,14 +165,14 @@ enum crk5_cfg_line_protocols {
 };
 
 // -----------------------------------------------------------------------
-struct crk5_cfg_line {
+struct crk5_cfg_lines {
 	bool configured;
 	bool multix;
 	int dir;
 	bool used;
 	int type;
 	int protocol;
-	int line_count;
+	int count;
 };
 
 // -----------------------------------------------------------------------
@@ -218,7 +218,7 @@ struct crk5_cfg {
 	uint16_t unused_word_2c;
 	struct crk5_cfg_mongroup mongroup;
 	struct crk5_cfg_oprq oprq;
-	struct crk5_cfg_line line[CRK5_CFG_LINE_SLOTS];
+	struct crk5_cfg_lines lines[CRK5_CFG_LINE_SLOTS];
 };
 
 void crk5_cfg_init_empty(struct crk5_cfg *cfg);

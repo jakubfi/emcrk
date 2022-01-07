@@ -499,44 +499,44 @@ const char * crk5_cfg_line_protocol_name(int proto)
 }
 
 // -----------------------------------------------------------------------
-bool crk5_cfg_line_decode(uint16_t d, struct crk5_cfg_line *line)
+bool crk5_cfg_lines_decode(uint16_t d, struct crk5_cfg_lines *lines)
 {
 	if (d == 0xffff) {
-		line->configured = false;
+		lines->configured = false;
 	} else {
-		line->configured = true;
-		line->multix = d >> 8;
-		line->dir = d >> 13;
-		if (line->multix && ((line->dir < 2) || (line->dir == 3) || (line->dir == 5) || (line->dir > 7))) return false;
-		line->used = d & (1<<12);
-		line->type = (d >> 8) & 0b1111;
-		if (line->multix && (line->type > CRK5_CFG_LINE_TYPE_SYNC)) return false;
-		line->protocol = (d >> 5) & 0b111;
-		if (line->protocol > CRK5_CFG_LINE_PROTO_TERMINAL) return false;
-		line->line_count = (d & 0b11111) + 1;
+		lines->configured = true;
+		lines->multix = d >> 8;
+		lines->dir = d >> 13;
+		if (lines->multix && ((lines->dir < 2) || (lines->dir == 3) || (lines->dir == 5) || (lines->dir > 7))) return false;
+		lines->used = d & (1<<12);
+		lines->type = (d >> 8) & 0b1111;
+		if (lines->multix && (lines->type > CRK5_CFG_LINE_TYPE_SYNC)) return false;
+		lines->protocol = (d >> 5) & 0b111;
+		if (lines->protocol > CRK5_CFG_LINE_PROTO_TERMINAL) return false;
+		lines->count = (d & 0b11111) + 1;
 	}
 
 	return true;
 }
 
 // -----------------------------------------------------------------------
-bool crk5_cfg_line_encode(struct crk5_cfg_line *line, uint16_t *d)
+bool crk5_cfg_lines_encode(struct crk5_cfg_lines *lines, uint16_t *d)
 {
-	if (!line || !d) return false;
+	if (!lines || !d) return false;
 
-	if (!line->configured) {
+	if (!lines->configured) {
 		*d = 0xffff;
 	} else {
-		if (line->multix) {
-			if ((line->dir != CRK5_CFG_LINE_DIR_INPUT) && (line->dir != CRK5_CFG_LINE_DIR_OUTPUT) && (line->dir != CRK5_CFG_LINE_DIR_HDUPLEX) && (line->dir != CRK5_CFG_LINE_DIR_FDUPLEX)) return false;
-		if (line->type > CRK5_CFG_LINE_TYPE_SYNC) return false;
+		if (lines->multix) {
+			if ((lines->dir != CRK5_CFG_LINE_DIR_INPUT) && (lines->dir != CRK5_CFG_LINE_DIR_OUTPUT) && (lines->dir != CRK5_CFG_LINE_DIR_HDUPLEX) && (lines->dir != CRK5_CFG_LINE_DIR_FDUPLEX)) return false;
+		if (lines->type > CRK5_CFG_LINE_TYPE_SYNC) return false;
 		}
-		if ((line->protocol > CRK5_CFG_LINE_PROTO_TERMINAL) || (line->line_count > 32)) return false;
-		*d = line->dir << 13
-			| line->used << 12
-			| line->type << 8
-			| line->protocol << 5
-			| (line->line_count - 1);
+		if ((lines->protocol > CRK5_CFG_LINE_PROTO_TERMINAL) || (lines->count > 32)) return false;
+		*d = lines->dir << 13
+			| lines->used << 12
+			| lines->type << 8
+			| lines->protocol << 5
+			| (lines->count - 1);
 	}
 
 	return true;
@@ -567,7 +567,7 @@ bool crk5_cfg_decode(uint16_t *d, struct crk5_cfg *cfg)
 	cfg->unused_word_2c = d[0x2c];;
 	res &= crk5_cfg_mongroup_decode(d[0x2f], &cfg->mongroup);
 	res &= crk5_cfg_oprq_decode(d[0x30], &cfg->oprq);
-	for (i=0 ; i<CRK5_CFG_LINE_SLOTS ; i++) res &= crk5_cfg_line_decode(d[0x31+i], cfg->line+i);
+	for (i=0 ; i<CRK5_CFG_LINE_SLOTS ; i++) res &= crk5_cfg_lines_decode(d[0x31+i], cfg->lines+i);
 
 	return res;
 }
@@ -597,7 +597,7 @@ bool crk5_cfg_encode(struct crk5_cfg *cfg, uint16_t *d)
 	d[0x2c] = cfg->unused_word_2c;
 	res &= crk5_cfg_mongroup_encode(&cfg->mongroup, d+0x2f);
 	res &= crk5_cfg_oprq_encode(&cfg->oprq, d+0x30);
-	for (i=0 ; i<CRK5_CFG_LINE_SLOTS ; i++) res &= crk5_cfg_line_encode(cfg->line+i, d+0x31+i);
+	for (i=0 ; i<CRK5_CFG_LINE_SLOTS ; i++) res &= crk5_cfg_lines_encode(cfg->lines+i, d+0x31+i);
 
 	return res;
 }
