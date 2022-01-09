@@ -168,11 +168,19 @@ enum crk5_cfg_line_protocols {
 struct crk5_cfg_lines {
 	bool configured;
 	bool multix;
-	int dir;
-	bool used;
-	int type;
-	int protocol;
-	int count;
+	union {
+		struct mx {
+			int dir;
+			bool used;
+			int type;
+			int protocol;
+			int count;
+		} mx;
+		struct ch {
+			int dev;
+			int unused_bits_0_11;
+		} ch;
+	} d;
 };
 
 // -----------------------------------------------------------------------

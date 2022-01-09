@@ -504,16 +504,21 @@ bool crk5_cfg_lines_decode(uint16_t d, struct crk5_cfg_lines *lines)
 	if (d == 0xffff) {
 		lines->configured = false;
 	} else {
-		lines->configured = true;
 		lines->multix = d >> 8;
-		lines->dir = d >> 13;
-		if (lines->multix && ((lines->dir < 2) || (lines->dir == 3) || (lines->dir == 5) || (lines->dir > 7))) return false;
-		lines->used = d & (1<<12);
-		lines->type = (d >> 8) & 0b1111;
-		if (lines->multix && (lines->type > CRK5_CFG_LINE_TYPE_SYNC)) return false;
-		lines->protocol = (d >> 5) & 0b111;
-		if (lines->protocol > CRK5_CFG_LINE_PROTO_TERMINAL) return false;
-		lines->count = (d & 0b11111) + 1;
+		lines->configured = true;
+		if (lines->multix) {
+			lines->d.mx.dir = d >> 13;
+			if ((lines->d.mx.dir < 2) || (lines->d.mx.dir == 3) || (lines->d.mx.dir == 5) || (lines->d.mx.dir > 7)) return false;
+			lines->d.mx.used = d & (1<<12);
+			lines->d.mx.type = (d >> 8) & 0b1111;
+			if (lines->d.mx.type > CRK5_CFG_LINE_TYPE_SYNC) return false;
+			lines->d.mx.protocol = (d >> 5) & 0b111;
+			if (lines->d.mx.protocol > CRK5_CFG_LINE_PROTO_TERMINAL) return false;
+			lines->d.mx.count = (d & 0b11111) + 1;
+		} else {
+			lines->d.ch.dev = d & 0b1111;
+			lines->d.ch.unused_bits_0_11 = d >> 4;
+		}
 	}
 
 	return true;
@@ -526,17 +531,18 @@ bool crk5_cfg_lines_encode(struct crk5_cfg_lines *lines, uint16_t *d)
 
 	if (!lines->configured) {
 		*d = 0xffff;
+	} else if (lines->multix) {
+		if ((lines->d.mx.dir != CRK5_CFG_LINE_DIR_INPUT) && (lines->d.mx.dir != CRK5_CFG_LINE_DIR_OUTPUT) && (lines->d.mx.dir != CRK5_CFG_LINE_DIR_HDUPLEX) && (lines->d.mx.dir != CRK5_CFG_LINE_DIR_FDUPLEX)) return false;
+		if (lines->d.mx.type > CRK5_CFG_LINE_TYPE_SYNC) return false;
+		if ((lines->d.mx.protocol > CRK5_CFG_LINE_PROTO_TERMINAL) || (lines->d.mx.count > 32)) return false;
+		*d = lines->d.mx.dir << 13
+			| lines->d.mx.used << 12
+			| lines->d.mx.type << 8
+			| lines->d.mx.protocol << 5
+			| (lines->d.mx.count - 1);
 	} else {
-		if (lines->multix) {
-			if ((lines->dir != CRK5_CFG_LINE_DIR_INPUT) && (lines->dir != CRK5_CFG_LINE_DIR_OUTPUT) && (lines->dir != CRK5_CFG_LINE_DIR_HDUPLEX) && (lines->dir != CRK5_CFG_LINE_DIR_FDUPLEX)) return false;
-		if (lines->type > CRK5_CFG_LINE_TYPE_SYNC) return false;
-		}
-		if ((lines->protocol > CRK5_CFG_LINE_PROTO_TERMINAL) || (lines->count > 32)) return false;
-		*d = lines->dir << 13
-			| lines->used << 12
-			| lines->type << 8
-			| lines->protocol << 5
-			| (lines->count - 1);
+		if (lines->d.ch.dev > 15) return false;
+		*d = lines->d.ch.unused_bits_0_11 << 4 | lines->d.ch.dev;
 	}
 
 	return true;
