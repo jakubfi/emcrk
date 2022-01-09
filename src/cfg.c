@@ -181,7 +181,7 @@ bool crk5_cfg_mem_encode(struct crk5_cfg_mem *mem, uint16_t *d)
 }
 
 // -----------------------------------------------------------------------
-const char * crk5_cfg_disk_type_name(int type)
+const char * crk5_cfg_disk_type_name(unsigned type)
 {
 	static const char *names[] = {
 		"MERA 9425",
@@ -192,21 +192,21 @@ const char * crk5_cfg_disk_type_name(int type)
 		_INVALID_
 	};
 
-	if ((type < 0) || (type > CRK5_CFG_DISK_PLIX)) return names[5];
+	if (type > CRK5_CFG_DISK_PLIX) return names[5];
 	return names[type];
 }
 
 // -----------------------------------------------------------------------
-const char * crk5_cfg_disk_floppy_density_name(int type)
+const char * crk5_cfg_disk_floppy_density_name(unsigned type)
 {
 	static const char *names[] = { "SD", "DD", "HD", _INVALID_ };
 
-	if ((type < 0) || (type > CRK5_CFG_FLOP5_HD)) return names[3];
+	if (type > CRK5_CFG_FLOP5_HD) return names[3];
 	return names[type];
 }
 
 // -----------------------------------------------------------------------
-const char * crk5_cfg_disk_plix_type_name(int type)
+const char * crk5_cfg_disk_plix_type_name(unsigned type)
 {
 	static const char *names[] = {
 		"EC 5061",
@@ -216,7 +216,7 @@ const char * crk5_cfg_disk_plix_type_name(int type)
 		_INVALID_
 	};
 
-	if ((type < 0) || (type > CRK5_CFG_PLIX_DEV_9425_WHOLE)) return names[4];
+	if (type > CRK5_CFG_PLIX_DEV_9425_WHOLE) return names[4];
 	return names[type];
 }
 
@@ -229,7 +229,7 @@ bool crk5_cfg_disk_decode(uint16_t d, struct crk5_cfg_disk *disk)
 	} else {
 		disk->configured = true;
 		disk->foreign = d & (1<<15);
-		int tmp_type = (d >> 13) & 0b11;
+		unsigned tmp_type = (d >> 13) & 0b11;
 
 		switch (tmp_type) {
 			case 0: // 9425, mem channel:
@@ -389,14 +389,14 @@ bool crk5_cfg_tape_encode(struct crk5_cfg_tape *tape, uint16_t *d)
 }
 
 // -----------------------------------------------------------------------
-bool crk5_cfg_int_decode(uint16_t d, int *i, int shift, int mask)
+bool crk5_cfg_int_decode(uint16_t d, unsigned *i, int shift, int mask)
 {
 	*i = (d >> shift) & mask;
 	return true;
 }
 
 // -----------------------------------------------------------------------
-bool crk5_cfg_int_encode(int i, uint16_t *d, int shift, int mask)
+bool crk5_cfg_int_encode(unsigned i, uint16_t *d, int shift, int mask)
 {
 	if (!d) return false;
 	if (i > mask) return false;
@@ -453,7 +453,7 @@ bool crk5_cfg_oprq_encode(struct crk5_cfg_oprq *oprq, uint16_t *d)
 }
 
 // -----------------------------------------------------------------------
-const char * crk5_cfg_line_dir_name(int dir)
+const char * crk5_cfg_line_dir_name(unsigned dir)
 {
 	static const char *names[] = {
 		_INVALID_,
@@ -466,12 +466,12 @@ const char * crk5_cfg_line_dir_name(int dir)
 		"full duplex"
 	};
 
-	if ((dir < 0) || (dir > 7)) return names[0];
+	if (dir > 7) return names[0];
 	return names[dir];
 }
 
 // -----------------------------------------------------------------------
-const char * crk5_cfg_line_type_name(int type)
+const char * crk5_cfg_line_type_name(unsigned type)
 {
 	static const char *names[] = {
 		"serial (USART)",
@@ -480,12 +480,12 @@ const char * crk5_cfg_line_type_name(int type)
 		_INVALID_
 	};
 
-	if ((type < 0) || (type > 2)) return names[3];
+	if (type > 2) return names[3];
 	return names[type];
 }
 
 // -----------------------------------------------------------------------
-const char * crk5_cfg_line_protocol_name(int proto)
+const char * crk5_cfg_line_protocol_name(unsigned proto)
 {
 	static const char *names[] = {
 		"punched tape reader",
@@ -494,7 +494,7 @@ const char * crk5_cfg_line_protocol_name(int proto)
 		_INVALID_
 	};
 
-	if ((proto < 0) || (proto > 2)) return names[3];
+	if (proto > 2) return names[3];
 	return names[proto];
 }
 
@@ -549,7 +549,7 @@ bool crk5_cfg_lines_encode(struct crk5_cfg_lines *lines, uint16_t *d)
 }
 
 // -----------------------------------------------------------------------
-bool crk5_cfg_winch_quant_decode(uint16_t d, int *winch_quant)
+bool crk5_cfg_winch_quant_decode(uint16_t d, unsigned *winch_quant)
 {
 	*winch_quant = d;
 
@@ -557,9 +557,9 @@ bool crk5_cfg_winch_quant_decode(uint16_t d, int *winch_quant)
 }
 
 // -----------------------------------------------------------------------
-bool crk5_cfg_winch_quant_encode(int winch_quant, uint16_t *d)
+bool crk5_cfg_winch_quant_encode(unsigned winch_quant, uint16_t *d)
 {
-	if ((winch_quant < 0) || (winch_quant > 0xffff)) return false;
+	if (winch_quant > 0xffff) return false;
 	*d = winch_quant;
 
 	return true;

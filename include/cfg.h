@@ -53,11 +53,11 @@ struct crk5_cfg_sys {
 	bool auto_ram_files;
 	bool dir_guard;
 	bool dir_write_check;
-	int unused_bits_3_7;
+	unsigned unused_bits_3_7;
 	unsigned dir_vec_count;
 
 	unsigned os_blocks;
-	int unused_bits_4_7;
+	unsigned unused_bits_4_7;
 	unsigned line_buf_len;
 };
 
@@ -71,7 +71,7 @@ struct crk5_cfg_mx_lines {
 	bool bs_can;
 	bool uppercase;
 	bool unused_bit_8;
-	int stream_vectors;
+	unsigned stream_vectors;
 };
 
 // -----------------------------------------------------------------------
@@ -111,36 +111,36 @@ struct crk5_cfg_disk {
 	// 10..1f
 	bool configured;
 	bool foreign;
-	int type;
+	unsigned type;
 
 	union {
 		struct m9425 {
-			int chan;
-			int dev;
+			unsigned chan;
+			unsigned dev;
 			bool fixed;
-			int unused_bits_3_6;
+			unsigned unused_bits_3_6;
 		} m9425;
 		struct winch {
-			int start_quant;
-			int type;
-			int num;
-			int unused_bit_3;
+			unsigned start_quant;
+			unsigned type;
+			unsigned num;
+			unsigned unused_bit_3;
 		} winch;
 		struct flop8 {
-			int dev;
-			int door;
-			int unused_bits_4_7;
+			unsigned dev;
+			unsigned door;
+			unsigned unused_bits_4_7;
 		} flop8;
 		struct plix {
-			int type;
-			int controller;
-			int dev;
-			int unused_bits_3_5;
+			unsigned type;
+			unsigned controller;
+			unsigned dev;
+			unsigned unused_bits_3_5;
 		} plix;
 		struct flop5 {
-			int density;
-			int dev;
-			int unused_bits_4_9;
+			unsigned density;
+			unsigned dev;
+			unsigned unused_bits_4_9;
 		} flop5;
 	} d;
 };
@@ -171,15 +171,15 @@ struct crk5_cfg_lines {
 	bool multix;
 	union {
 		struct mx {
-			int dir;
+			unsigned dir;
 			bool used;
-			int type;
-			int protocol;
-			int count;
+			unsigned type;
+			unsigned protocol;
+			unsigned count;
 		} mx;
 		struct ch {
-			int dev;
-			int unused_bits_0_11;
+			unsigned dev;
+			unsigned unused_bits_0_11;
 		} ch;
 	} d;
 };
@@ -192,29 +192,29 @@ struct crk5_cfg_tape {
 // -----------------------------------------------------------------------
 struct crk5_cfg_chandev {
 	bool configured;
-	int chan;
-	int dev;
+	unsigned chan;
+	unsigned dev;
 };
 
 // -----------------------------------------------------------------------
 struct crk5_cfg_mongroup {
 	bool configured;
-	int dev;
+	unsigned dev;
 };
 
 // -----------------------------------------------------------------------
 struct crk5_cfg_oprq {
 	bool multix_reset;
-	int ini_line;
+	unsigned ini_line;
 };
 
 // -----------------------------------------------------------------------
 struct crk5_cfg_winch_type {
-	int unused_bits_0_3;
+	unsigned unused_bits_0_3;
 	bool big;
-	int heads;
-	int unused_bits_8_15;
-	int park_cyl;
+	unsigned heads;
+	unsigned unused_bits_8_15;
+	unsigned park_cyl;
 	bool autopark;
 };
 
@@ -232,13 +232,13 @@ struct crk5_cfg {
 	struct crk5_cfg_chandev ch_char[CRK5_CFG_CHAR_SLOTS];
 	struct crk5_cfg_chandev rtc;
 	struct crk5_cfg_chandev net;
-	int winch_line;
-	int floppy_line;
+	unsigned winch_line;
+	unsigned floppy_line;
 	uint16_t unused_word_2c;
 	struct crk5_cfg_mongroup mongroup;
 	struct crk5_cfg_oprq oprq;
 	struct crk5_cfg_lines lines[CRK5_CFG_LINE_SLOTS];
-	int winch_quant;
+	unsigned winch_quant;
 	struct crk5_cfg_winch_type winch_type[CRK5_CFG_WINCH_TYPE_SLOTS];
 };
 
@@ -246,12 +246,12 @@ void crk5_cfg_init_empty(struct crk5_cfg *cfg);
 bool crk5_cfg_decode(uint16_t *d, struct crk5_cfg *cfg);
 bool crk5_cfg_encode(struct crk5_cfg *cfg, uint16_t *d);
 
-const char * crk5_cfg_disk_type_name(int type);
-const char * crk5_cfg_disk_floppy_density_name(int type);
-const char * crk5_cfg_disk_plix_type_name(int type);
-const char * crk5_cfg_line_dir_name(int dir);
-const char * crk5_cfg_line_type_name(int type);
-const char * crk5_cfg_line_protocol_name(int proto);
+const char * crk5_cfg_disk_type_name(unsigned type);
+const char * crk5_cfg_disk_floppy_density_name(unsigned type);
+const char * crk5_cfg_disk_plix_type_name(unsigned type);
+const char * crk5_cfg_line_dir_name(unsigned dir);
+const char * crk5_cfg_line_type_name(unsigned type);
+const char * crk5_cfg_line_protocol_name(unsigned proto);
 
 #ifdef __cplusplus
 }
