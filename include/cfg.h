@@ -25,7 +25,7 @@
 extern "C" {
 #endif
 
-#define CRK5_CFG_SIZE_WORDS 0x40
+#define CRK5_CFG_SIZE_WORDS 0x6b
 #define CRK5_CFG_SIZE_BYTES (CRK5_CFG_SIZE_WORDS*2)
 
 #define CRK5_CFG_MEM_SLOTS 8
@@ -34,6 +34,7 @@ extern "C" {
 #define CRK5_CFG_LINE_SLOTS 15
 #define CRK5_CFG_CAMAC_SLOTS 4
 #define CRK5_CFG_CHAR_SLOTS 2
+#define CRK5_CFG_WINCH_TYPE_SLOTS 4
 
 #define CRK5_CFG_ABSENT -1
 
@@ -208,6 +209,16 @@ struct crk5_cfg_oprq {
 };
 
 // -----------------------------------------------------------------------
+struct crk5_cfg_winch_type {
+	int unused_bits_0_3;
+	bool big;
+	int heads;
+	int unused_bits_8_15;
+	int park_cyl;
+	bool autopark;
+};
+
+// -----------------------------------------------------------------------
 struct crk5_cfg {
 	uint16_t magic[4];
 	struct crk5_cfg_sys sys;
@@ -227,6 +238,8 @@ struct crk5_cfg {
 	struct crk5_cfg_mongroup mongroup;
 	struct crk5_cfg_oprq oprq;
 	struct crk5_cfg_lines lines[CRK5_CFG_LINE_SLOTS];
+	int winch_quant;
+	struct crk5_cfg_winch_type winch_type[CRK5_CFG_WINCH_TYPE_SLOTS];
 };
 
 void crk5_cfg_init_empty(struct crk5_cfg *cfg);

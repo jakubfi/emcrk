@@ -549,6 +549,71 @@ bool crk5_cfg_lines_encode(struct crk5_cfg_lines *lines, uint16_t *d)
 }
 
 // -----------------------------------------------------------------------
+bool crk5_cfg_winch_quant_decode(uint16_t d, int *winch_quant)
+{
+	*winch_quant = d;
+
+	return true;
+}
+
+// -----------------------------------------------------------------------
+bool crk5_cfg_winch_quant_encode(int winch_quant, uint16_t *d)
+{
+	if ((winch_quant < 0) || (winch_quant > 0xffff)) return false;
+	*d = winch_quant;
+
+	return true;
+}
+
+// -----------------------------------------------------------------------
+bool crk5_cfg_winch_type_decode(uint16_t d, struct crk5_cfg_winch_type *wtype)
+{
+	wtype->unused_bits_0_3 = (d >> 12) & 0b1111;
+	wtype->big = d >> 11;
+	wtype->heads = 1 + ((d >> 8) & 0b111);
+	wtype->unused_bits_8_15 = d & 0xff;
+
+	return true;
+}
+
+// -----------------------------------------------------------------------
+bool crk5_cfg_winch_type_encode(struct crk5_cfg_winch_type *wtype, uint16_t *d)
+{
+	if (wtype->heads > 8) return false;
+	*d = wtype->unused_bits_0_3 << 12
+		| wtype->big << 11
+		| ((wtype->heads - 1) << 8)
+		| (wtype->unused_bits_8_15 & 0xff);
+
+	return true;
+}
+
+// -----------------------------------------------------------------------
+bool crk5_cfg_winch_park_decode(uint16_t d, struct crk5_cfg_winch_type *wtype)
+{
+	if (d == 0xffff) {
+		wtype->autopark = true;
+	} else {
+		wtype->autopark = false;
+		wtype->park_cyl = d;
+	}
+
+	return true;
+}
+
+// -----------------------------------------------------------------------
+bool crk5_cfg_winch_park_encode(struct crk5_cfg_winch_type *wtype, uint16_t *d)
+{
+	if (wtype->autopark) {
+		*d = 0xffff;
+	} else {
+		if (wtype->park_cyl > 0xffff) return false;
+		*d = wtype->park_cyl;
+	}
+	return true;
+}
+
+// -----------------------------------------------------------------------
 bool crk5_cfg_decode(uint16_t *d, struct crk5_cfg *cfg)
 {
 	int i;
@@ -574,6 +639,12 @@ bool crk5_cfg_decode(uint16_t *d, struct crk5_cfg *cfg)
 	res &= crk5_cfg_mongroup_decode(d[0x2f], &cfg->mongroup);
 	res &= crk5_cfg_oprq_decode(d[0x30], &cfg->oprq);
 	for (i=0 ; i<CRK5_CFG_LINE_SLOTS ; i++) res &= crk5_cfg_lines_decode(d[0x31+i], cfg->lines+i);
+
+	res &= crk5_cfg_winch_quant_decode(d[0x63], &cfg->winch_quant);
+	for (i=0 ; i<CRK5_CFG_WINCH_TYPE_SLOTS ; i++) {
+		res &= crk5_cfg_winch_type_decode(d[0x64+i], cfg->winch_type+i);
+		res &= crk5_cfg_winch_park_decode(d[0x68+i], cfg->winch_type+i);
+	}
 
 	return res;
 }
@@ -604,6 +675,12 @@ bool crk5_cfg_encode(struct crk5_cfg *cfg, uint16_t *d)
 	res &= crk5_cfg_mongroup_encode(&cfg->mongroup, d+0x2f);
 	res &= crk5_cfg_oprq_encode(&cfg->oprq, d+0x30);
 	for (i=0 ; i<CRK5_CFG_LINE_SLOTS ; i++) res &= crk5_cfg_lines_encode(cfg->lines+i, d+0x31+i);
+
+	res &= crk5_cfg_winch_quant_encode(cfg->winch_quant, d+0x63);
+	for (i=0 ; i<CRK5_CFG_WINCH_TYPE_SLOTS ; i++) {
+		res &= crk5_cfg_winch_type_encode(cfg->winch_type+i, d+0x64+i);
+		res &= crk5_cfg_winch_park_encode(cfg->winch_type+i, d+0x68+i);
+	}
 
 	return res;
 }

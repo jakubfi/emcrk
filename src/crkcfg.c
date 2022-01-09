@@ -185,6 +185,16 @@ void cfg_dump(struct crk5_cfg *cfg)
 			}
 		}
 	}
+
+	printf("winch.quant = %i\n", cfg->winch_quant);
+	for (int i=0 ; i<CRK5_CFG_WINCH_TYPE_SLOTS ; i++) {
+		printf("winch.type.%i.big = %i\n", i, cfg->winch_type[i].big);
+		printf("winch.type.%i.heads = %i\n", i, cfg->winch_type[i].heads);
+		printf("winch.type.%i.autopark = %i\n", i, cfg->winch_type[i].autopark);
+		if (!cfg->winch_type[i].autopark) {
+			printf("winch.type.%i.park_cyl = %i\n", i, cfg->winch_type[i].park_cyl);
+		}
+	}
 }
 
 // -----------------------------------------------------------------------
