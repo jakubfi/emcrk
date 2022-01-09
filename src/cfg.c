@@ -19,6 +19,8 @@
 #include <stdbool.h>
 #include <stdlib.h>
 #include <string.h>
+#include <stdio.h>
+#include <arpa/inet.h>
 
 #include "cfg.h"
 
@@ -683,6 +685,53 @@ bool crk5_cfg_encode(struct crk5_cfg *cfg, uint16_t *d)
 	}
 
 	return res;
+}
+
+// -----------------------------------------------------------------------
+bool crk5_cfg_decode_file(FILE *f, off_t kernel_offset, struct crk5_cfg *cfg)
+{
+	uint16_t buf[CRK5_CFG_SIZE_WORDS];
+
+	if (fseek(f, kernel_offset*2, SEEK_SET)) {
+		return false;
+	}
+	if (fread(buf, sizeof(uint16_t), CRK5_CFG_SIZE_WORDS, f) != CRK5_CFG_SIZE_WORDS) {
+		return false;
+	}
+
+	for (int i=0 ; i<CRK5_CFG_SIZE_WORDS ; i++) {
+		buf[i] = ntohs(buf[i]);
+	}
+
+	return crk5_cfg_decode(buf, cfg);
+}
+
+// -----------------------------------------------------------------------
+bool crk5_cfg_encode_file(struct crk5_cfg *cfg, FILE *f, off_t kernel_offset)
+{
+	uint16_t buf[CRK5_CFG_SIZE_WORDS];
+
+	if (!crk5_cfg_encode(cfg, buf)) {
+		return false;
+	}
+
+	for (int i=0 ; i<CRK5_CFG_SIZE_WORDS ; i++) {
+		buf[i] = htons(buf[i]);
+	}
+
+	int ranges[2][2] = {
+		{ CRK5_CFG_CFG_START, CRK5_CFG_CFG_WORDS },
+		{ CRK5_CFG_WTYPES_START, CRK5_CFG_WTYPES_WORDS },
+	};
+	for (int j=0 ; j<2 ; j++) {
+		if (fseek(f, (kernel_offset + ranges[j][0]) * 2, SEEK_SET)) {
+			return false;
+		}
+		if (fwrite(buf + ranges[j][0], sizeof(uint16_t), ranges[j][1], f) != ranges[j][1]) {
+			return false;
+		}
+	}
+	return true;
 }
 
 // -----------------------------------------------------------------------
