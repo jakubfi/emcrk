@@ -244,16 +244,25 @@ int main(int argc, char **argv)
 	} else if (!strcmp(opt, "-c")) {
 		bool recode_ok = true;
 		uint16_t encoded[CRK5_CFG_SIZE_WORDS];
+
 		if (!crk5_cfg_encode(&cfg, encoded)) {
 			printf("ERROR: Failed to encode configuration correctly.\n");
 			exit(FAIL_ENCODE);
 		}
-		for (int i=0 ; i<CRK5_CFG_SIZE_WORDS ; i++) {
-			if (encoded[i] != buf[i]) {
-				printf("ERR @ %i 0x%04x -> 0x%04x\n", i, buf[i], encoded[i]);
-				recode_ok = false;
+
+		int ranges[2][2] = {
+			{ CRK5_CFG_CFG_START, CRK5_CFG_CFG_END },
+			{ CRK5_CFG_WTYPES_START, CRK5_CFG_WTYPES_END },
+		};
+		for (int j=0 ; j<2 ; j++) {
+			for (int i=ranges[j][0] ; i<=ranges[j][1] ; i++) {
+				if (encoded[i] != buf[i]) {
+					printf("ERR @ %i 0x%04x -> 0x%04x\n", i, buf[i], encoded[i]);
+					recode_ok = false;
+				}
 			}
 		}
+
 		if (recode_ok) {
 			exit(0);
 		} else {
