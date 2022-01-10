@@ -621,7 +621,6 @@ bool crk5_cfg_decode(uint16_t *d, struct crk5_cfg *cfg)
 	int i;
 	bool res = true;
 
-	for (i=0 ; i<4 ; i++) cfg->magic[i] = d[i];
 	res &= crk5_cfg_sys4_decode(d[0x04], &cfg->sys);
 	res &= crk5_cfg_mx_decode(d[0x05], &cfg->mx);
 	res &= crk5_cfg_sys6_decode(d[0x06], &cfg->sys);
@@ -657,7 +656,6 @@ bool crk5_cfg_encode(struct crk5_cfg *cfg, uint16_t *d)
 	int i;
 	bool res = true;
 
-	for (i=0 ; i<4 ; i++) d[i] = cfg->magic[i];
 	res &= crk5_cfg_sys4_encode(&cfg->sys, d+0x04);
 	res &= crk5_cfg_mx_encode(&cfg->mx, d+0x05);
 	res &= crk5_cfg_sys6_encode(&cfg->sys, d+0x06);
@@ -688,7 +686,7 @@ bool crk5_cfg_encode(struct crk5_cfg *cfg, uint16_t *d)
 }
 
 // -----------------------------------------------------------------------
-bool crk5_cfg_decode_file(FILE *f, off_t kernel_offset, struct crk5_cfg *cfg)
+bool crk5_cfg_load(FILE *f, off_t kernel_offset, struct crk5_cfg *cfg)
 {
 	uint16_t buf[CRK5_CFG_SIZE_WORDS];
 
@@ -707,7 +705,7 @@ bool crk5_cfg_decode_file(FILE *f, off_t kernel_offset, struct crk5_cfg *cfg)
 }
 
 // -----------------------------------------------------------------------
-bool crk5_cfg_encode_file(struct crk5_cfg *cfg, FILE *f, off_t kernel_offset)
+bool crk5_cfg_save(struct crk5_cfg *cfg, FILE *f, off_t kernel_offset)
 {
 	uint16_t buf[CRK5_CFG_SIZE_WORDS];
 

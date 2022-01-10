@@ -228,7 +228,6 @@ struct crk5_cfg_winch_type {
 
 // -----------------------------------------------------------------------
 struct crk5_cfg {
-	uint16_t magic[4];
 	struct crk5_cfg_sys sys;
 	struct crk5_cfg_mx_lines mx;
 	struct crk5_cfg_mem mem[CRK5_CFG_MEM_SLOTS];
@@ -253,8 +252,8 @@ struct crk5_cfg {
 void crk5_cfg_init_empty(struct crk5_cfg *cfg);
 bool crk5_cfg_decode(uint16_t *d, struct crk5_cfg *cfg);
 bool crk5_cfg_encode(struct crk5_cfg *cfg, uint16_t *d);
-bool crk5_cfg_decode_file(FILE *f, off_t kernel_offset, struct crk5_cfg *cfg);
-bool crk5_cfg_encode_file(struct crk5_cfg *cfg, FILE *f, off_t kernel_offset);
+bool crk5_cfg_load(FILE *f, off_t kernel_offset, struct crk5_cfg *cfg);
+bool crk5_cfg_save(struct crk5_cfg *cfg, FILE *f, off_t kernel_offset);
 
 const char * crk5_cfg_disk_type_name(unsigned type);
 const char * crk5_cfg_disk_floppy_density_name(unsigned type);
