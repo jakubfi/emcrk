@@ -364,7 +364,8 @@ bool crk5_cfg_chandev_encode(struct crk5_cfg_chandev *chandev, uint16_t *d)
 		*d = 0xffff;
 	} else {
 		if ((chandev->chan > 0b1111) || (chandev->dev > 0b111)) return false;
-		*d = (chandev->chan << 1) | chandev->dev << 5;
+		*d = (chandev->chan << 1)
+			| chandev->dev << 5;
 	}
 
 	return true;
@@ -544,7 +545,8 @@ bool crk5_cfg_lines_encode(struct crk5_cfg_lines *lines, uint16_t *d)
 			| (lines->d.mx.count - 1);
 	} else {
 		if (lines->d.ch.dev > 15) return false;
-		*d = lines->d.ch.unused_bits_0_11 << 4 | lines->d.ch.dev;
+		*d = lines->d.ch.unused_bits_0_11 << 4
+			| lines->d.ch.dev;
 	}
 
 	return true;
