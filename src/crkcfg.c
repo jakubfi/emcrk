@@ -18,7 +18,11 @@
 #include <inttypes.h>
 #include <stdio.h>
 #include <stdlib.h>
+#ifdef _WIN32
+#include <winsock2.h>
+#else
 #include <arpa/inet.h>
+#endif
 #include <string.h>
 
 #include "cfg.h"

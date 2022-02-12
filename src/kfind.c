@@ -22,7 +22,9 @@
 #include <sys/stat.h>
 #include <unistd.h>
 #include <stdio.h>
+#ifndef _WIN32
 #include <sys/mman.h>
+#endif
 
 #include "kfind.h"
 
@@ -227,12 +229,25 @@ struct crk5_kern_result * crk5_kern_findall_file(FILE *f, bool swap_bytes)
 	struct stat sb;
 	int fd = fileno(f);
 	if (fstat(fd, &sb) == -1) return NULL;
+
+#ifdef _WIN32
+	// TODO: real mmap on windows
+	uint16_t *buf = malloc(sb.st_size);
+	int res = fread(buf, 1, sb.st_size, f);
+	if (res != sb.st_size) return NULL;
+#else
 	uint16_t *buf = mmap(NULL, sb.st_size, PROT_READ, MAP_PRIVATE, fd, 0);
 	if (buf == MAP_FAILED) return NULL;
+#endif
 
 	struct crk5_kern_result *ret = _crk5_kern_findall(buf, sb.st_size/2, swap_bytes);
 
+#ifdef _WIN32
+	free(buf);
+#else
 	munmap(buf, sb.st_size);
+#endif
+
 	return ret;
 }
 

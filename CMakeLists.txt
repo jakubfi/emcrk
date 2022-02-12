@@ -31,6 +31,10 @@ add_library(emcrk SHARED
 	${EMCRK_PUBLIC_HEADERS}
 )
 
+if(WIN32)
+	target_link_libraries(emcrk ws2_32)
+endif(WIN32)
+
 set_target_properties(emcrk PROPERTIES
 	OUTPUT_NAME "emcrk"
 	SOVERSION ${APP_VERSION_MAJOR}.${APP_VERSION_MINOR}

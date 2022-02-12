@@ -38,7 +38,7 @@ int main(int argc, char **argv)
 		exit(1);
 	}
 
-	FILE *f = fopen(argv[1], "r");
+	FILE *f = fopen(argv[1], "rb");
 	if (!f) {
 		fprintf(stderr, "Cannot open file %s for reading.\n", argv[1]);
 		exit(1);
