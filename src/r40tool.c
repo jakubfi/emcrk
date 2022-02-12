@@ -41,7 +41,7 @@ static void help()
 static int encode(int argc, char **argv, int indx)
 {
 	unsigned len;
-	uint16_t *out;
+	uint16_t *out = NULL;
 
 	while (indx < argc) {
 		out = ascii_to_r40(argv[indx], &len, NULL);
