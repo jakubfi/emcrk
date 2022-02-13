@@ -46,8 +46,7 @@ jobs:
     env:
       BUILD_TYPE: Release
       CC: ${{matrix.compiler.CC}}
-      SRC_DIR: ${{github.workspace}}/src
-      BUILD_DIR: ${{github.workspace}}/build
+      SRC_DIR: ${{github.workspace}}
       INSTALL_PREFIX: /mingw64
     steps:
       - uses: msys2/setup-msys2@v2
@@ -58,8 +57,13 @@ jobs:
             git
             mingw-w64-x86_64-toolchain
             mingw-w64-x86_64-cmake
-            mingw-w64-x86_64-ninja
           update: true
       - uses: actions/checkout@v2
-      - name: CI-Build
-        run: ./.ci/ci-script.sh
+      - name: Initialize
+        run: ./.ci/ci-script.sh init
+      - name: Configure
+        run: ./.ci/ci-script.sh configure
+      - name: Build
+        run: ./.ci/ci-script.sh build
+      - name: Install
+        run: ./.ci/ci-script.sh install
