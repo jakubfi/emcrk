@@ -1,7 +1,7 @@
 #!/bin/bash
 
 ACTION=$1
-BUID_DIR=$SRC_DIR/build
+BUILD_DIR=$SRC_DIR/build
 
 case $ACTION in
 
