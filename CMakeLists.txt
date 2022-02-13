@@ -63,7 +63,7 @@ export(
 	FILE "${CMAKE_CURRENT_BINARY_DIR}/emcrk-config-targets.cmake"
 )
 
-set(ConfigPackageLocation lib/cmake/emcrk)
+set(ConfigPackageLocation ${CMAKE_INSTALL_LIBDIR}/cmake/emcrk)
 configure_package_config_file(cmake/emcrk-config.cmake.in
 	"${CMAKE_CURRENT_BINARY_DIR}/emcrk-config.cmake"
 	INSTALL_DESTINATION ${ConfigPackageLocation}
