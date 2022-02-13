@@ -7,7 +7,7 @@ on:
     branches: [master]
 
 jobs:
-  build:
+  Linux-build:
     name: build on ${{matrix.os}} with ${{matrix.compiler.compiler}}
     runs-on: ${{matrix.os}}
     strategy:
@@ -25,6 +25,40 @@ jobs:
       - uses: actions/checkout@v2
       - name: Install packages for ${{matrix.compiler.compiler}}
         run: sudo apt-get -y install ${{matrix.compiler.packages}}
+      - name: Configure project
+        run: cmake -B ${{github.workspace}}/build -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}}
+      - name: Build
+        run: cmake --build ${{github.workspace}}/build --config ${{env.BUILD_TYPE}}
+      - name: Install
+        run: sudo cmake --install ${{github.workspace}}/build
+
+  Win64-build:
+    name: Win64 build
+    runs-on: windows-latest
+    strategy:
+      fail-fast: true
+      matrix:
+        compiler:
+          - { compiler: GNU,  CC: gcc,   CXX: g++ }
+#          - { compiler: LLVM, CC: clang, CXX: clang++ }
+    defaults:
+      run:
+        shell: msys2 {0}
+    env:
+      CMAKE_BUILD_TYPE: Release
+      CC: ${{ matrix.compiler.CC }}
+    steps:
+      - uses: msys2/setup-msys2@v2
+        with:
+          msystem: MINGW64
+          install: >-
+            base-devel
+            git
+            mingw-w64-x86_64-toolchain
+            mingw-w64-x86_64-cmake
+            mingw-w64-x86_64-ninja
+          update: true
+      - uses: actions/checkout@v2
       - name: Configure project
         run: cmake -B ${{github.workspace}}/build -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}}
       - name: Build
