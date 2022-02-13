@@ -59,9 +59,7 @@ jobs:
             mingw-w64-x86_64-ninja
           update: true
       - uses: actions/checkout@v2
-      - name: Configure project
-        run: cmake -B ${{github.workspace}}/build -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}}
-      - name: Build
-        run: cmake --build ${{github.workspace}}/build --config ${{env.BUILD_TYPE}}
-      - name: Install
-        run: sudo cmake --install ${{github.workspace}}/build
+      - name: CI-Build
+        run: |
+          echo 'Running in MSYS2!'
+          ./ci-build.sh
