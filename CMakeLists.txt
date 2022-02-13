@@ -36,13 +36,13 @@ if(WIN32)
 endif(WIN32)
 
 set_target_properties(emcrk PROPERTIES
+	C_STANDARD 99
 	OUTPUT_NAME "emcrk"
 	SOVERSION ${APP_VERSION_MAJOR}.${APP_VERSION_MINOR}
+	PUBLIC_HEADER "${EMCRK_PUBLIC_HEADERS}"
 )
 
-set_property(TARGET emcrk PROPERTY C_STANDARD 99)
 target_compile_definitions(emcrk PRIVATE EMCRK_VERSION="${APP_VERSION}")
-set_target_properties(emcrk PROPERTIES PUBLIC_HEADER "${EMCRK_PUBLIC_HEADERS}")
 
 install(TARGETS emcrk
 	EXPORT emcrkTarget
