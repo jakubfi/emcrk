@@ -47,6 +47,7 @@ jobs:
       BUILD_TYPE: Release
       CC: ${{matrix.compiler.CC}}
       SRC_DIR: ${{github.workspace}}
+      BUILD_DIR: ${{github.workspace}}/build
       INSTALL_PREFIX: /mingw64
     steps:
       - uses: msys2/setup-msys2@v2

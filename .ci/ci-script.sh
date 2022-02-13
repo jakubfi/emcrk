@@ -1,7 +1,6 @@
 #!/bin/bash
 
 ACTION=$1
-BUILD_DIR=$SRC_DIR/build
 
 case $ACTION in
 
@@ -10,7 +9,7 @@ case $ACTION in
 	;;
 
 	configure)
-		cmake -B "$BUILD_DIR" -DCMAKE_BUILD_TYPE="$BUILD_TYPE" -G "Unix Makefiles" "$SRC_DIR"
+		cmake "$SRC_DIR" -G "Unix Makefiles" -B "$BUILD_DIR" -DCMAKE_BUILD_TYPE="$BUILD_TYPE" -DCMAKE_INSTALL_PREFIX="$INSTALL_PREFIX"
 	;;
 
 	build)
@@ -18,7 +17,7 @@ case $ACTION in
 	;;
 
 	install)
-		sudo cmake --install "$BUILD_DIR"
+		cmake --install "$BUILD_DIR"
 	;;
 
 	*)
