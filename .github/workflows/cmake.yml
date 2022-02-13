@@ -62,6 +62,4 @@ jobs:
           update: true
       - uses: actions/checkout@v2
       - name: CI-Build
-        run: |
-          echo 'Running in MSYS2!'
-          ./.ci/ci-script.sh
+        run: ./.ci/ci-script.sh

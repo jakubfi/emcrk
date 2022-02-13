@@ -1,4 +1,4 @@
 #!/bin/bash
-cmake -B $SRC_DIR -DCMAKE_BUILD_TYPE=$BUILD_TYPE
+cmake -B $SRC_DIR -DCMAKE_BUILD_TYPE=$BUILD_TYPE -G "Unix Makefiles"
 cmake --build $BUILD_DIR --config $BUILD_TYPE
 sudo cmake --install $BUILD_DIR
