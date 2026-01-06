@@ -12,10 +12,10 @@ jobs:
     runs-on: ${{matrix.os}}
     strategy:
       matrix:
-        os: [ ubuntu-20.04 ]
+        os: [ ubuntu-latest ]
         compiler:
-          - { compiler: GNU10, CC: gcc-10, CXX: g++-10, packages: gcc-10 g++-10 }
-          - { compiler: LLVM12, CC: clang-12, CXX: clang++-12, packages: clang-12 libomp-12-dev libclang-common-12-dev llvm-12-dev clang++-12 libc++-12-dev libc++1-12 libc++abi1-12 lld-12 }
+          - { compiler: GNU15, CC: gcc-15, CXX: g++-15, packages: gcc-15 g++-15 }
+          - { compiler: LLVM21, CC: clang-21, CXX: clang++-21, packages: clang-21 libomp-21-dev llvm-21-dev libc++-21-dev libc++abi1-21 lld-21 clang-tools-21 mlir-21-tools libmlir-21-dev }
     env:
       BUILD_TYPE: Release
       CC: ${{matrix.compiler.CC}}
