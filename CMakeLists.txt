@@ -7,7 +7,6 @@ project(emcrk
 include(GNUInstallDirs)
 include(cmake/appversion.cmake)
 
-include_directories(${CMAKE_SOURCE_DIR}/include)
 add_compile_options(-Wall)
 
 # ---- Target: emcrk -----------------------------------------------------
@@ -34,6 +33,12 @@ add_library(emcrk SHARED
 if(WIN32)
 	target_link_libraries(emcrk ws2_32)
 endif(WIN32)
+
+# Export header location so find_package(emcrk) consumers get the include path.
+target_include_directories(emcrk PUBLIC
+	$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+	$<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>
+)
 
 set_target_properties(emcrk PROPERTIES
 	C_STANDARD 99
