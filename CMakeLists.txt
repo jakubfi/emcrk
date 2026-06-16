@@ -110,4 +110,13 @@ set_property(TARGET r40 PROPERTY C_STANDARD 99)
 target_link_libraries(r40 emcrk)
 install(TARGETS r40 RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR})
 
+# ---- Tests -------------------------------------------------------------
+
+enable_testing()
+
+add_executable(test_r40 test/test_r40.c)
+set_property(TARGET test_r40 PROPERTY C_STANDARD 99)
+target_link_libraries(test_r40 emcrk)
+add_test(NAME r40 COMMAND test_r40)
+
 # vim: tabstop=4

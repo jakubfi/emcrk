@@ -29,6 +29,8 @@ jobs:
         run: cmake -B ${{github.workspace}}/build -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}}
       - name: Build
         run: cmake --build ${{github.workspace}}/build --config ${{env.BUILD_TYPE}}
+      - name: Test
+        run: ctest --test-dir ${{github.workspace}}/build --output-on-failure
       - name: Install
         run: sudo cmake --install ${{github.workspace}}/build
 
@@ -66,5 +68,7 @@ jobs:
         run: ./.ci/ci-script.sh configure
       - name: Build
         run: ./.ci/ci-script.sh build
+      - name: Test
+        run: ./.ci/ci-script.sh test
       - name: Install
         run: ./.ci/ci-script.sh install

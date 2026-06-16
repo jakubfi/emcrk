@@ -16,6 +16,10 @@ case $ACTION in
 		cmake --build "$BUILD_DIR"
 	;;
 
+	test)
+		ctest --test-dir "$BUILD_DIR" --output-on-failure
+	;;
+
 	install)
 		cmake --install "$BUILD_DIR"
 	;;
