@@ -20,7 +20,7 @@
 #include <string.h>
 
 // -----------------------------------------------------------------------
-int r40len(char *s)
+int r40len(const char *s)
 {
 	return (strlen(s) + 2) / 3;
 }
@@ -68,7 +68,7 @@ static int r40_to_char(unsigned i)
 }
 
 // -----------------------------------------------------------------------
-int r40_valid_char(char ch, int allow_lowercase)
+int r40_valid_char(char ch)
 {
 	if (char_to_r40(ch) != -1) {
 		return 1;
@@ -78,7 +78,7 @@ int r40_valid_char(char ch, int allow_lowercase)
 }
 
 // -----------------------------------------------------------------------
-int r40_valid_str(char *str, int allow_lowercase)
+int r40_valid_str(const char *str)
 {
 	while (*str) {
 		if (char_to_r40(*str) == -1) {
@@ -91,30 +91,34 @@ int r40_valid_str(char *str, int allow_lowercase)
 }
 
 // -----------------------------------------------------------------------
-uint16_t * ascii_to_r40(char *ascii, int *r40_len, uint16_t *r40)
+uint16_t * ascii_to_r40(const char *ascii, unsigned *r40_len, uint16_t *r40)
 {
-	char *s = ascii;
+	const char *s = ascii;
 	int mul = 1600;
 	int result_len = r40len(ascii);
 	uint16_t *dest;
-
-	if (r40) {
-		dest = r40;
-	} else {
-		dest = malloc(sizeof(uint16_t) * result_len);
-	}
-
-	uint16_t *r40p = dest;
 
 	if (r40_len) {
 		*r40_len = 0;
 	}
 
+	if (r40) {
+		dest = r40;
+	} else {
+		// always allocate at least one element so "" never hits malloc(0)
+		dest = malloc(sizeof(uint16_t) * (result_len ? result_len : 1));
+		if (!dest) {
+			return NULL;
+		}
+	}
+
+	uint16_t *r40p = dest;
+
 	for (int i=0 ; i<result_len ; i++) {
 		dest[i] = 0;
 	}
 
-	while (s && *s) {
+	while (*s) {
 		int ch = char_to_r40(*s);
 
 		if (ch < 0) {
@@ -151,25 +155,33 @@ char * r40_to_ascii(uint16_t *r40, unsigned r40_len, char *ascii)
 {
 	char *buf;
 	int bpos = 0;
-	int div;
+	int d;
+	int term = 0; // seen a \0; every lower position must be \0 as well
 
 	if (ascii) {
 		buf = ascii;
 	} else {
 		buf = malloc(3*r40_len + 1);
+		if (!buf) {
+			return NULL;
+		}
 	}
 
 	while (r40_len > 0) {
-		div = 1600;
-		while (div >= 1) {
-			int ch = r40_to_char((*r40/div) % 40);
-			if (ch < 0) {
-				free(buf);
+		d = 1600;
+		while (d >= 1) {
+			// (*r40/d) % 40 is always 0..39, so r40_to_char never fails here
+			int ch = r40_to_char((*r40/d) % 40);
+			if (ch == 0) {
+				term = 1;
+			} else if (term) {
+				// non-zero char after a \0: words fill left-to-right, so this is not valid R40
+				if (!ascii) free(buf);
 				return NULL;
+			} else {
+				buf[bpos++] = ch;
 			}
-			buf[bpos] = ch;
-			div /= 40;
-			bpos++;
+			d /= 40;
 		}
 		r40++;
 		r40_len--;

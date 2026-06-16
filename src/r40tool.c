@@ -82,6 +82,10 @@ static int decode(int argc, char **argv, int indx)
 	}
 
 	out = r40_to_ascii(buf, i, NULL);
+	if (!out) {
+		fprintf(stderr, "Input is not a valid R40 sequence.\n");
+		return 1;
+	}
 	printf("%s\n", out);
 
 	free(out);
