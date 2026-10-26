@@ -54,8 +54,13 @@ static const uint16_t start_addr_lim = 0x00a0;
 static const int chcs_pat[] = { 0xd480, 0x40c0, PAT_ANY, 0x4240, ENDSYS, 0x88c1, PAT_END };
 static const uint16_t chcs_addr_lim = 0x0070;
 
-// COPSYS code: LA ???, RA r1, LW r1, [???]
-static const int copsys_pat[] = { 0xf480, PAT_ANY, 0xf881, 0x4240, PAT_END };
+// COPSYS: IM NMASK; RWS r4, SYSNUM; LA INI; RA r1
+static const int copsys_pat[] = { 0xfc40, PAT_ANY, PAT_ANY, 0xf480, PAT_ANY, 0xf881, PAT_END };
+static const int copsys_rws_pos = 2;
+static const uint16_t rws_r4_neg_mask = 0xffc0;
+static const uint16_t rws_r4_neg_pat = 0xdf00;
+// installed image size (SYSTEM region)
+static const off_t kern_max_len = 0x5f00;
 
 #define S(x) (swap_bytes ? ((x & 0xff) << 8 | (x >> 8)) : x)
 
@@ -111,15 +116,22 @@ static struct crk5_kern_result * _crk5_kern_find(uint16_t *buf, off_t len, bool 
 	off_t klen = len - kern->offset;
 
 	// get kernel version
-	off_t copsys_pos = pat_search(kstart, klen, copsys_pat, swap_bytes);
-	if (copsys_pos >= 0) {
-		off_t sysnum_offset = S(kstart[copsys_pos-1]) & 0b111111;
-		uint16_t kversion = S(kstart[copsys_pos-sysnum_offset]);
-		kern->vmaj = (kversion & 0b0000000001111111);
-		kern->vmin = (kversion & 0b1111111110000000) >> 7;
-	} else {
-		kern->vmaj = 0;
-		kern->vmin = 0;
+	kern->vmaj = 0;
+	kern->vmin = 0;
+	off_t vlen = klen < kern_max_len ? klen : kern_max_len;
+	off_t vpos = 0;
+	off_t copsys_pos;
+	while ((copsys_pos = pat_search(kstart+vpos, vlen-vpos, copsys_pat, swap_bytes)) >= 0) {
+		off_t rws_pos = vpos + copsys_pos + copsys_rws_pos;
+		uint16_t rws = S(kstart[rws_pos]);
+		off_t sysnum_pos = rws_pos + 1 - (rws & 0b111111);
+		if (((rws & rws_r4_neg_mask) == rws_r4_neg_pat) && (sysnum_pos >= 0)) {
+			uint16_t kversion = S(kstart[sysnum_pos]);
+			kern->vmaj = (kversion & 0b0000000001111111);
+			kern->vmin = (kversion & 0b1111111110000000) >> 7;
+			break;
+		}
+		vpos += copsys_pos + 1;
 	}
 
 	// check if this kernel is for modified cpu
@@ -199,10 +211,15 @@ static struct crk5_kern_result * _crk5_kern_findall(uint16_t *buf, off_t len, bo
 	struct crk5_kern_result *kern = NULL;
 	struct crk5_kern_result *lkern;
 
-	do {
+	while (offset < len) {
+		off_t kpos = pat_search(buf+offset, len-offset, kern_pat, swap_bytes);
+		if (kpos < 0) {
+			break;
+		}
+		offset += kpos;
 		tkern = _crk5_kern_find(buf+offset, len-offset, swap_bytes);
 		if (tkern) {
-			offset += tkern->offset + kern_pat_len;
+			tkern->offset += offset;
 			if (!kern) {
 				kern = tkern;
 			} else {
@@ -210,7 +227,8 @@ static struct crk5_kern_result * _crk5_kern_findall(uint16_t *buf, off_t len, bo
 			}
 			lkern = tkern;
 		}
-	} while (tkern && (offset < len));
+		offset += kern_pat_len;
+	}
 
 	return kern;
 }
