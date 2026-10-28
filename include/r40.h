@@ -24,9 +24,14 @@
 extern "C" {
 #endif
 
+enum r40_mode {
+	R40_STRICT,	// decode: NULL unless left-packed and every word < 64000; encode: reject space
+	R40_RAW,	// decode: every code, 0 as space, trailing spaces trimmed; encode: space as 0
+};
+
 int r40len(const char *s);
-uint16_t * ascii_to_r40(const char *ascii, unsigned *r40_len, uint16_t *r40);
-char * r40_to_ascii(uint16_t *r40, unsigned r40_len, char *ascii);
+uint16_t * ascii_to_r40(const char *ascii, unsigned *r40_len, uint16_t *r40, enum r40_mode mode);
+char * r40_to_ascii(const uint16_t *r40, unsigned r40_len, char *ascii, enum r40_mode mode);
 
 int r40_valid_char(char ch);
 int r40_valid_str(const char *str);

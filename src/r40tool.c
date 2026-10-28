@@ -24,12 +24,16 @@
 
 enum modes { NONE, ENCODE, DECODE };
 
+static enum r40_mode r40_mode = R40_STRICT;
+
 // -----------------------------------------------------------------------
 static void help()
 {
 	fprintf(stderr,
-		"Usage: r40 -e string [string ...] - encode ascii strings into R40 values\n"
-		"       r40 [-d] value [value ...] - decode R40 values into ascii string\n"
+		"Usage: r40 [-r] -e string [string ...] - encode ascii strings into R40 values\n"
+		"       r40 [-r] [-d] value [value ...] - decode R40 values into ascii string\n"
+		"\n"
+		"  -r  raw: decode every code, 0 as a space; encode a space as 0\n"
 		"\n"
 		"R40 encodes 3 characters into one 16-bit integer.\n"
 		"Characters allowed in R40 code are: A-Z, 0-9, _, %%, #.\n"
@@ -44,7 +48,7 @@ static int encode(int argc, char **argv, int indx)
 	uint16_t *out = NULL;
 
 	while (indx < argc) {
-		out = ascii_to_r40(argv[indx], &len, NULL);
+		out = ascii_to_r40(argv[indx], &len, NULL, r40_mode);
 		if (!out) {
 			fprintf(stderr, "Input contains characters invalid in R40.\n");
 			return 1;
@@ -54,10 +58,10 @@ static int encode(int argc, char **argv, int indx)
 			printf("0x%04x ", out[i]);
 		}
 		printf("\n");
+		free(out);
 		indx++;
 	}
 
-	free(out);
 	return 0;
 }
 
@@ -81,7 +85,7 @@ static int decode(int argc, char **argv, int indx)
 		i++;
 	}
 
-	out = r40_to_ascii(buf, i, NULL);
+	out = r40_to_ascii(buf, i, NULL, r40_mode);
 	if (!out) {
 		fprintf(stderr, "Input is not a valid R40 sequence.\n");
 		return 1;
@@ -100,13 +104,16 @@ int main(int argc, char **argv)
 	int mode = DECODE;
 	int ret;
 
-	while ((opt = getopt(argc, argv, "ed")) != -1) {
+	while ((opt = getopt(argc, argv, "edr")) != -1) {
 		switch (opt) {
 			case 'e':
 				mode = ENCODE;
 				break;
 			case 'd':
 				mode = DECODE;
+				break;
+			case 'r':
+				r40_mode = R40_RAW;
 				break;
 			default:
 				help();

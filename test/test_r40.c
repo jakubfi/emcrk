@@ -80,27 +80,27 @@ static void test_encode_values(void)
 	uint16_t *r;
 
 	// F=6 O=15 O=15 -> 6*1600 + 15*40 + 15 = 0x27e7
-	r = ascii_to_r40("FOO", &len, NULL);
+	r = ascii_to_r40("FOO", &len, NULL, R40_STRICT);
 	CHECK(r != NULL);
 	CHECK(len == 1);
 	if (r) CHECK(r[0] == 0x27e7);
 	free(r);
 
 	// A=1 B=2 (trailing 0) -> 1*1600 + 2*40 = 0x0690
-	r = ascii_to_r40("AB", &len, NULL);
+	r = ascii_to_r40("AB", &len, NULL, R40_STRICT);
 	CHECK(r != NULL);
 	CHECK(len == 1);
 	if (r) CHECK(r[0] == 0x0690);
 	free(r);
 
 	// #=39 in every position -> 39*1600 + 39*40 + 39 = 0xf9ff (max word)
-	r = ascii_to_r40("###", &len, NULL);
+	r = ascii_to_r40("###", &len, NULL, R40_STRICT);
 	CHECK(r != NULL);
 	if (r) CHECK(r[0] == 0xf9ff);
 	free(r);
 
 	// lowercase folds onto uppercase codes
-	r = ascii_to_r40("foo", &len, NULL);
+	r = ascii_to_r40("foo", &len, NULL, R40_STRICT);
 	CHECK(r != NULL);
 	if (r) CHECK(r[0] == 0x27e7);
 	free(r);
@@ -113,13 +113,13 @@ static void test_encode_errors(void)
 	uint16_t *r;
 
 	// invalid char: returns NULL and reports its position in r40_len
-	r = ascii_to_r40("AB-CD", &len, NULL);
+	r = ascii_to_r40("AB-CD", &len, NULL, R40_STRICT);
 	CHECK(r == NULL);
 	CHECK(len == 2);
 
 	// empty input: valid, zero-length, must not return NULL (no malloc(0))
 	len = 999;
-	r = ascii_to_r40("", &len, NULL);
+	r = ascii_to_r40("", &len, NULL, R40_STRICT);
 	CHECK(r != NULL);
 	CHECK(len == 0);
 	free(r);
@@ -132,31 +132,31 @@ static void test_decode_strict(void)
 
 	// (0,0,1): leading zeros then a non-zero -> not valid R40
 	uint16_t bad1 = 0x0001;
-	out = r40_to_ascii(&bad1, 1, NULL);
+	out = r40_to_ascii(&bad1, 1, NULL, R40_STRICT);
 	CHECK(out == NULL);
 
 	// (A,0,B) = 1*1600 + 0 + 2 = 1602: zero between non-zeros -> invalid
 	uint16_t bad2 = 1602;
-	out = r40_to_ascii(&bad2, 1, NULL);
+	out = r40_to_ascii(&bad2, 1, NULL, R40_STRICT);
 	CHECK(out == NULL);
 
 	// trailing zeros are fine: (A,B,0) decodes to "AB"
 	uint16_t ok = 0x0690;
-	out = r40_to_ascii(&ok, 1, NULL);
+	out = r40_to_ascii(&ok, 1, NULL, R40_STRICT);
 	CHECK(out != NULL);
 	if (out) CHECK(strcmp(out, "AB") == 0);
 	free(out);
 
 	// all-zero word decodes to an empty string
 	uint16_t zero = 0;
-	out = r40_to_ascii(&zero, 1, NULL);
+	out = r40_to_ascii(&zero, 1, NULL, R40_STRICT);
 	CHECK(out != NULL);
 	if (out) CHECK(strcmp(out, "") == 0);
 	free(out);
 
 	// a zero-padded word followed by a non-empty word is invalid across words
 	uint16_t words[2] = { 0x0690 /* "AB" */, 1600 /* "A" */ };
-	out = r40_to_ascii(words, 2, NULL);
+	out = r40_to_ascii(words, 2, NULL, R40_STRICT);
 	CHECK(out == NULL);
 }
 
@@ -164,11 +164,11 @@ static void test_decode_strict(void)
 static void roundtrip(const char *in, const char *expected)
 {
 	unsigned len;
-	uint16_t *r = ascii_to_r40(in, &len, NULL);
+	uint16_t *r = ascii_to_r40(in, &len, NULL, R40_STRICT);
 	CHECK(r != NULL);
 	if (!r) return;
 
-	char *out = r40_to_ascii(r, len, NULL);
+	char *out = r40_to_ascii(r, len, NULL, R40_STRICT);
 	CHECK(out != NULL);
 	if (out) {
 		CHECK(strcmp(out, expected) == 0);
@@ -196,15 +196,118 @@ static void test_caller_buffers(void)
 	// encode into a caller-supplied word buffer
 	uint16_t words[2] = { 0xffff, 0xffff };
 	unsigned len;
-	uint16_t *r = ascii_to_r40("ABCDEF", &len, words);
+	uint16_t *r = ascii_to_r40("ABCDEF", &len, words, R40_STRICT);
 	CHECK(r == words);
 	CHECK(len == 2);
 
 	// decode into a caller-supplied char buffer
 	char buf[3 * 2 + 1];
-	char *out = r40_to_ascii(words, 2, buf);
+	char *out = r40_to_ascii(words, 2, buf, R40_STRICT);
 	CHECK(out == buf);
 	CHECK(strcmp(buf, "ABCDEF") == 0);
+}
+
+// -----------------------------------------------------------------------
+static void test_decode_overflow(void)
+{
+	char *out;
+
+	// 63999 = "###" is the largest word with every code < 40
+	uint16_t max = 63999;
+	out = r40_to_ascii(&max, 1, NULL, R40_STRICT);
+	CHECK(out && !strcmp(out, "###"));
+	free(out);
+
+	// 64000: top code 40, wraps to "" without the check
+	uint16_t over = 64000;
+	CHECK(r40_to_ascii(&over, 1, NULL, R40_STRICT) == NULL);
+	out = r40_to_ascii(&over, 1, NULL, R40_RAW);
+	CHECK(out && !strcmp(out, ""));
+	free(out);
+}
+
+// -----------------------------------------------------------------------
+static int decodes_raw(const uint16_t *words, unsigned len, const char *expected)
+{
+	char *out = r40_to_ascii(words, len, NULL, R40_RAW);
+	int res = out && !strcmp(out, expected);
+	free(out);
+	return res;
+}
+
+// -----------------------------------------------------------------------
+static void test_decode_raw(void)
+{
+	uint16_t gap = 2 * 1600 + 27;		// (B,0,0-digit)
+	uint16_t lead = 7;					// (0,0,G)
+	uint16_t ab = 0x0690;				// (A,B,0)
+	uint16_t zero = 0;
+	uint16_t words[2] = { 0x0690, 1600 };	// "AB" then "A"
+	uint16_t trail[2] = { 0x27e7, 0 };	// "FOO" then nothing
+
+	CHECK(decodes_raw(&gap, 1, "B 0"));
+	CHECK(decodes_raw(&lead, 1, "  G"));
+	CHECK(decodes_raw(&ab, 1, "AB"));
+	CHECK(decodes_raw(&zero, 1, ""));
+	CHECK(decodes_raw(words, 2, "AB A"));
+	CHECK(decodes_raw(trail, 2, "FOO"));
+
+	// raw decode of a valid value equals the strict decode
+	char *s = r40_to_ascii(&ab, 1, NULL, R40_STRICT);
+	CHECK(s && decodes_raw(&ab, 1, s));
+	free(s);
+}
+
+// -----------------------------------------------------------------------
+static void test_encode_raw(void)
+{
+	unsigned len;
+	uint16_t *r;
+
+	// space is not an R40 character in strict mode
+	r = ascii_to_r40("B 0", &len, NULL, R40_STRICT);
+	CHECK(r == NULL);
+	CHECK(len == 1);
+
+	r = ascii_to_r40("B 0", &len, NULL, R40_RAW);
+	CHECK(r && (len == 1) && (r[0] == 2 * 1600 + 27));
+	free(r);
+
+	r = ascii_to_r40("  G", &len, NULL, R40_RAW);
+	CHECK(r && (len == 1) && (r[0] == 7));
+	free(r);
+
+	r = ascii_to_r40("AB A", &len, NULL, R40_RAW);
+	CHECK(r && (len == 2) && (r[0] == 0x0690) && (r[1] == 1600));
+	free(r);
+}
+
+// -----------------------------------------------------------------------
+// raw decode then raw encode gives back every word below 64000
+static void test_roundtrip_raw(void)
+{
+	int bad = 0;
+	char buf[4];
+	uint16_t back[1];
+	unsigned len;
+
+	for (unsigned w=0 ; w<64000 ; w++) {
+		uint16_t word = w;
+		back[0] = 0xffff;
+		if (!r40_to_ascii(&word, 1, buf, R40_RAW)) {
+			bad++;
+			continue;
+		}
+		if (!ascii_to_r40(buf, &len, back, R40_RAW)) {
+			bad++;
+			continue;
+		}
+		// trailing zero codes are trimmed, so an all-zero word encodes to no words
+		if (((len == 0) && (word != 0)) || ((len == 1) && (back[0] != word))) {
+			bad++;
+		}
+	}
+	CHECK(bad == 0);
 }
 
 // -----------------------------------------------------------------------
@@ -218,6 +321,10 @@ int main(void)
 	test_decode_strict();
 	test_roundtrip();
 	test_caller_buffers();
+	test_decode_overflow();
+	test_decode_raw();
+	test_encode_raw();
+	test_roundtrip_raw();
 
 	printf("%d checks, %d failures\n", checks, failures);
 	return failures ? 1 : 0;

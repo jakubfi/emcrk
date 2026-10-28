@@ -178,7 +178,7 @@ struct crk5_exl_fil * crk5_exl_fil_unpack(uint16_t *data)
 
 	exl->err = data[0];
 	exl->stream_id = data[1];
-	exl->stream_name = r40_to_ascii(data+1, 1, NULL);
+	exl->stream_name = r40_to_ascii(data+1, 1, NULL, R40_RAW);
 	exl->type = data[2];
 	exl->len = data[3];
 	exl->param[0] = data[4];
@@ -207,7 +207,7 @@ struct crk5_exl_tmem * crk5_exl_tmem_unpack(uint16_t *data)
 
 	exl->err = data[0];
 	exl->stream_id = data[1];
-	exl->stream_name = r40_to_ascii(data+1, 1, NULL);
+	exl->stream_name = r40_to_ascii(data+1, 1, NULL, R40_RAW);
 	exl->addr = data[2];
 	// data[3] - unused
 	exl->seg = data[4];
@@ -303,9 +303,9 @@ struct crk5_exl_pinf *crk5_exl_pinf_unpack(uint16_t *data)
 	exl->entry_addr = data[4];
 	exl->words_used = data[5];
 	exl->attr = data[6];
-	exl->space_name = r40_to_ascii(data+7, 1, NULL);
-	exl->user_name = r40_to_ascii(data+8, 2, NULL);
-	exl->proc_name = r40_to_ascii(data+10, 2, NULL);
+	exl->space_name = r40_to_ascii(data+7, 1, NULL, R40_RAW);
+	exl->user_name = r40_to_ascii(data+8, 2, NULL, R40_RAW);
+	exl->proc_name = r40_to_ascii(data+10, 2, NULL, R40_RAW);
 
 	return exl;
 }
@@ -348,7 +348,7 @@ struct crk5_exl_str * crk5_exl_str_unpack(uint16_t *data)
 
 	exl->err = data[0];
 	exl->stream_id = data[1];
-	exl->stream_name = r40_to_ascii(data+1, 1, NULL);
+	exl->stream_name = r40_to_ascii(data+1, 1, NULL, R40_RAW);
 
 	return exl;
 }
@@ -399,7 +399,7 @@ struct crk5_exl_met * crk5_exl_met_unpack(uint16_t *data)
 	if (!exl) return NULL;
 
 	exl->disk_id = data[0];
-	exl->disk_name = r40_to_ascii(data, 1, NULL);
+	exl->disk_name = r40_to_ascii(data, 1, NULL, R40_RAW);
 	exl->dicdic = data[1];
 	exl->fildic = data[2];
 	exl->map = data[3];
@@ -424,7 +424,7 @@ struct crk5_exl_rec * crk5_exl_rec_unpack(uint16_t *data)
 
 	exl->position = data[0];
 	exl->stream_id = data[1];
-	exl->stream_name = r40_to_ascii(data+1, 1, NULL);
+	exl->stream_name = r40_to_ascii(data+1, 1, NULL, R40_RAW);
 	exl->buf_addr = data[2];
 	exl->end_char = data[3] >> 8;
 	exl->max_len = data[3] & 0xff;
@@ -451,7 +451,7 @@ struct crk5_exl_block * crk5_exl_block_unpack(uint16_t *data)
 
 	exl->transmitted = data[0];
 	exl->stream_id = data[1];
-	exl->stream_name = r40_to_ascii(data+1, 1, NULL);
+	exl->stream_name = r40_to_ascii(data+1, 1, NULL, R40_RAW);
 	exl->addr = data[2];
 	exl->count = data[3];
 	exl->start_sector = data[4];

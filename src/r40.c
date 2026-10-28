@@ -19,6 +19,8 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include "r40.h"
+
 // -----------------------------------------------------------------------
 int r40len(const char *s)
 {
@@ -91,7 +93,7 @@ int r40_valid_str(const char *str)
 }
 
 // -----------------------------------------------------------------------
-uint16_t * ascii_to_r40(const char *ascii, unsigned *r40_len, uint16_t *r40)
+uint16_t * ascii_to_r40(const char *ascii, unsigned *r40_len, uint16_t *r40, enum r40_mode mode)
 {
 	const char *s = ascii;
 	int mul = 1600;
@@ -119,7 +121,7 @@ uint16_t * ascii_to_r40(const char *ascii, unsigned *r40_len, uint16_t *r40)
 	}
 
 	while (*s) {
-		int ch = char_to_r40(*s);
+		int ch = ((mode == R40_RAW) && (*s == ' ')) ? 0 : char_to_r40(*s);
 
 		if (ch < 0) {
 			if (r40_len) {
@@ -151,12 +153,11 @@ uint16_t * ascii_to_r40(const char *ascii, unsigned *r40_len, uint16_t *r40)
 }
 
 // -----------------------------------------------------------------------
-char * r40_to_ascii(uint16_t *r40, unsigned r40_len, char *ascii)
+char * r40_to_ascii(const uint16_t *r40, unsigned r40_len, char *ascii, enum r40_mode mode)
 {
 	char *buf;
 	int bpos = 0;
-	int d;
-	int term = 0; // seen a \0; every lower position must be \0 as well
+	int term = 0; // seen a code 0; in strict mode every following code must be 0 as well
 
 	if (ascii) {
 		buf = ascii;
@@ -167,27 +168,35 @@ char * r40_to_ascii(uint16_t *r40, unsigned r40_len, char *ascii)
 		}
 	}
 
-	while (r40_len > 0) {
-		d = 1600;
-		while (d >= 1) {
-			// (*r40/d) % 40 is always 0..39, so r40_to_char never fails here
-			int ch = r40_to_char((*r40/d) % 40);
-			if (ch == 0) {
+	for (unsigned i=0 ; i<r40_len ; i++) {
+		// the top code would be 40 or more
+		if ((mode == R40_STRICT) && (r40[i] >= 64000)) {
+			goto invalid;
+		}
+		for (int d=1600 ; d>=1 ; d/=40) {
+			// (r40[i]/d) % 40 is always 0..39, so r40_to_char never fails here
+			int code = (r40[i]/d) % 40;
+			if (mode == R40_RAW) {
+				buf[bpos++] = code ? r40_to_char(code) : ' ';
+			} else if (!code) {
 				term = 1;
 			} else if (term) {
-				// non-zero char after a \0: words fill left-to-right, so this is not valid R40
-				if (!ascii) free(buf);
-				return NULL;
+				goto invalid;
 			} else {
-				buf[bpos++] = ch;
+				buf[bpos++] = r40_to_char(code);
 			}
-			d /= 40;
 		}
-		r40++;
-		r40_len--;
+	}
+
+	while ((bpos > 0) && (buf[bpos-1] == ' ')) {
+		bpos--;
 	}
 	buf[bpos] = '\0';
 	return buf;
+
+invalid:
+	if (!ascii) free(buf);
+	return NULL;
 }
 
 // vim: tabstop=4 shiftwidth=4 autoindent

@@ -50,7 +50,7 @@ struct crk5_process * crk5_process_unpack(uint16_t *ptr, uint16_t addr, int kern
 	memcpy(&(proc->_r1), ptr+42+offset, 2*13); // REJ..JLOLEN
 
 	proc->addr = addr;
-	proc->name = r40_to_ascii(proc->r40_name, 2, NULL);
+	proc->name = r40_to_ascii(proc->r40_name, 2, NULL, R40_RAW);
 	proc->segments &= 0xff;
 
 	return proc;

@@ -90,7 +90,7 @@ struct crk5_obj_disk * crk5_obj_disk_unpack(uint16_t *data)
 	if (!obj) return NULL;
 
 	obj->space = data[0];
-	obj->space_name = r40_to_ascii(data, 1, NULL);
+	obj->space_name = r40_to_ascii(data, 1, NULL, R40_RAW);
 	obj->start = data[1];
 	obj->end = data[2];
 
@@ -111,9 +111,9 @@ struct crk5_obj_file * crk5_obj_file_unpack(uint16_t *data)
 	struct crk5_obj_file *obj = malloc(sizeof(struct crk5_obj_file));
 	if (!obj) return NULL;
 
-	obj->space_name = r40_to_ascii(data, 1, NULL);
-	obj->dir_name = r40_to_ascii(data+1, 2, NULL); 
-	obj->file_name = r40_to_ascii(data+3, 2, NULL); 
+	obj->space_name = r40_to_ascii(data, 1, NULL, R40_RAW);
+	obj->dir_name = r40_to_ascii(data+1, 2, NULL, R40_RAW);
+	obj->file_name = r40_to_ascii(data+3, 2, NULL, R40_RAW);
 
 	return obj;
 }
@@ -173,7 +173,7 @@ struct crk5_obj_mem * crk5_obj_mem_unpack(uint16_t *data)
 	struct crk5_obj_mem *obj = malloc(sizeof(struct crk5_obj_mem));
 	if (!obj) return NULL;
 
-	obj->name = r40_to_ascii(data+3, 2, NULL);
+	obj->name = r40_to_ascii(data+3, 2, NULL, R40_RAW);
 
 	return obj;
 }
